@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lab Report System — Screen Wireframes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --primary:#2563EB;
+  --primary-dark:#1D4ED8;
+  --primary-50:#EFF6FF;
+  --primary-100:#DBEAFE;
+  --bg:#F8FAFC;
+  --card:#FFFFFF;
+  --border:#E5E7EB;
+  --border-strong:#CBD5E1;
+  --text:#0F172A;
+  --text-sub:#64748B;
+  --text-faint:#94A3B8;
+  --success:#16A34A;
+  --success-bg:#F0FDF4;
+  --warning:#F59E0B;
+  --warning-bg:#FFFBEB;
+  --danger:#DC2626;
+  --danger-bg:#FEF2F2;
+  --radius:8px;
+  --radius-sm:6px;
+  --radius-lg:14px;
+  --shadow-sm:0 1px 2px rgba(15,23,42,.06);
+  --shadow-md:0 4px 14px rgba(15,23,42,.08);
+  --shadow-lg:0 16px 40px rgba(15,23,42,.16);
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  font-size:14px;
+}
+.mono{font-family:'JetBrains Mono',monospace;}
+button{font-family:inherit;cursor:pointer;}
+input,select{font-family:inherit;}
+::selection{background:var(--primary-100);}
+a{color:inherit;}
+
+/* ============ PROTOTYPE NAV (meta — not part of the product) ============ */
+#protonav{
+  position:fixed;top:0;left:0;right:0;height:46px;z-index:9999;
+  background:#0B1220;display:flex;align-items:center;gap:4px;padding:0 14px;
+  font-size:12px;color:#94A3B8;box-shadow:0 2px 10px rgba(0,0,0,.25);
+}
+#protonav .label{font-weight:600;color:#E2E8F0;margin-right:10px;letter-spacing:.02em;}
+#protonav button{
+  background:transparent;border:1px solid transparent;color:#94A3B8;
+  padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;
+  transition:all .15s var(--ease);
+}
+#protonav button:hover{background:#1E293B;color:#E2E8F0;}
+#protonav button.active{background:var(--primary);color:white;}
+#protonav .spacer{flex:1;}
+#protonav .pill{font-size:11px;color:#64748B;border:1px solid #1E293B;padding:4px 8px;border-radius:20px;}
+
+.app-stage{margin-top:46px;}
+.screen{display:none;}
+.screen.active{display:block;animation:fadein .18s var(--ease);}
+@keyframes fadein{from{opacity:0;transform:translateY(2px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ SHARED COMPONENTS ============ */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:8px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;
+  border:1px solid var(--border);background:var(--card);color:var(--text);
+  transition:background .12s var(--ease),border-color .12s var(--ease),transform .08s var(--ease);
+}
+.btn:hover{background:#F1F5F9;}
+.btn:active{transform:scale(.98);}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:white;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-danger{color:var(--danger);border-color:#FECACA;background:var(--danger-bg);}
+.btn-danger:hover{background:#FEE2E2;}
+.btn-ghost{border-color:transparent;background:transparent;}
+.btn-ghost:hover{background:#F1F5F9;}
+.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-icon{width:32px;height:32px;padding:0;}
+
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11.5px;font-weight:600;color:var(--text-sub);text-transform:uppercase;letter-spacing:.04em;}
+.field input[type=text],.field input[type=password],.field input[type=number],.field input[type=date],.field select,.field textarea{
+  border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 11px;font-size:13.5px;
+  background:var(--card);color:var(--text);outline:none;transition:border-color .12s var(--ease),box-shadow .12s var(--ease);
+  width:100%;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-100);}
+.field .hint{font-size:11px;color:var(--text-faint);}
+
+.chip{
+  display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:20px;
+  border:1px solid var(--border);background:var(--card);font-size:12.5px;font-weight:600;color:var(--text-sub);
+  transition:all .14s var(--ease);
+}
+.chip:hover{border-color:var(--primary);color:var(--primary);}
+.chip.active{background:var(--primary-50);border-color:var(--primary);color:var(--primary-dark);}
+.chip .dot{width:6px;height:6px;border-radius:50%;background:var(--success);}
+
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text-sub);}
+.tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.03em;}
+.tag-success{background:var(--success-bg);color:var(--success);}
+.tag-warning{background:var(--warning-bg);color:var(--warning);}
+.tag-danger{background:var(--danger-bg);color:var(--danger);}
+.tag-muted{background:#F1F5F9;color:var(--text-sub);}
+
+/* scrollbars, Excel feel */
+::-webkit-scrollbar{width:10px;height:10px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:6px;}
+::-webkit-scrollbar-thumb:hover{background:#94A3B8;}
+
+/* Toast */
+#toast{
+  position:fixed;bottom:24px;right:24px;z-index:10000;
+  background:#0F172A;color:white;padding:13px 18px;border-radius:var(--radius);
+  font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);display:flex;align-items:center;gap:10px;
+  transform:translateY(20px);opacity:0;pointer-events:none;transition:all .22s var(--ease);
+}
+#toast.show{transform:translateY(0);opacity:1;}
+#toast .dot{width:8px;height:8px;border-radius:50%;background:var(--success);flex:none;}
+
+/* =====================================================================
+   SCREEN 1 — LOGIN
+===================================================================== */
+#screen-login{min-height:calc(100vh - 46px);display:flex;align-items:center;justify-content:center;padding:40px 20px;background:
+  radial-gradient(circle at 18% 20%, #EFF6FF 0%, var(--bg) 45%);}
+.login-shell{width:480px;display:flex;flex-direction:column;gap:16px;}
+.login-card{padding:38px 36px 30px;box-shadow:var(--shadow-md);}
+.login-logo{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,var(--primary),#1E40AF);
+  display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:17px;margin:0 auto 16px;}
+.login-card h1{font-size:18px;font-weight:800;text-align:center;margin:0 0 2px;letter-spacing:-.01em;}
+.login-card .sub{text-align:center;font-size:12.5px;color:var(--text-sub);margin:0 0 26px;}
+.login-form{display:flex;flex-direction:column;gap:14px;}
+.remember-row{display:flex;align-items:center;justify-content:space-between;margin-top:2px;}
+.checkbox-row{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-sub);font-weight:500;}
+.checkbox-row input{width:15px;height:15px;accent-color:var(--primary);}
+.forgot-link{font-size:12.5px;color:var(--primary);font-weight:600;text-decoration:none;}
+.login-submit{width:100%;padding:11px 0;font-size:13.5px;margin-top:6px;}
+.login-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text-faint);padding:0 4px;}
+.login-meta .license-ok{color:var(--success);font-weight:600;}
+.rules-card{padding:18px 22px;}
+.rules-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.rules-col .role{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.rules-col ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;}
+.rules-col li{font-size:12px;color:var(--text-sub);display:flex;align-items:center;gap:6px;}
+.rules-col li::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--border-strong);flex:none;}
+.device-lock{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border);display:flex;gap:8px;align-items:flex-start;font-size:11.5px;color:var(--text-sub);}
+
+/* =====================================================================
+   SCREEN 2 — HOME
+===================================================================== */
+#screen-home{height:calc(100vh - 46px);display:flex;flex-direction:column;background:var(--bg);}
+.topmenu{height:60px;flex:none;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 18px;gap:4px;box-shadow:var(--shadow-sm);}
+.topmenu .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:14px;margin-right:18px;}
+.topmenu .brand .sq{width:26px;height:26px;border-radius:7px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;}
+.topmenu .menu-item{padding:9px 13px;border-radius:7px;font-size:13px;font-weight:600;color:var(--text-sub);transition:background .12s var(--ease);border:none;background:transparent;}
+.topmenu .menu-item:hover{background:#F1F5F9;color:var(--text);}
+.topmenu .spacer{flex:1;}
+.topmenu .kbd-hint{font-size:11px;color:var(--text-faint);display:flex;align-items:center;gap:6px;margin-right:14px;}
+.topmenu kbd{font-family:'JetBrains Mono',monospace;background:#F1F5F9;border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-size:10.5px;}
+.user-pill{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border-radius:20px;border:1px solid var(--border);font-size:12.5px;font-weight:600;}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:#1E293B;color:white;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;}
+
+.tabbar{height:42px;flex:none;background:#F1F5F9;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;padding:0 12px;gap:4px;}
+.ptab{display:flex;align-items:center;gap:8px;padding:9px 12px 8px;border-radius:8px 8px 0 0;font-size:12.5px;font-weight:600;
+  color:var(--text-sub);background:transparent;border:none;position:relative;top:1px;transition:background .12s var(--ease);}
+.ptab:hover{background:#E2E8F0;}
+.ptab.active{background:var(--card);color:var(--text);box-shadow:0 -1px 0 var(--border) inset;border:1px solid var(--border);border-bottom:none;}
+.ptab .x{width:16px;height:16px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text-faint);font-size:13px;}
+.ptab .x:hover{background:#FEE2E2;color:var(--danger);}
+.tab-add{width:28px;height:28px;border-radius:7px;border:1px dashed var(--border-strong);background:transparent;color:var(--text-sub);font-size:15px;margin-bottom:6px;}
+.tab-add:hover{border-color:var(--primary);color:var(--primary);background:var(--primary-50);}
+
+.home-body{flex:1;display:flex;overflow:hidden;}
+.home-left{width:65%;padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
+.home-right{width:35%;border-left:1px solid var(--border);padding:18px;overflow-y:auto;background:#FBFCFE;display:flex;flex-direction:column;gap:16px;}
+
+.panel{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+.panel-head{display:flex;align-items:center;justify-content:space-between;}
+.patient-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;}
+.patient-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.patient-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+.quick-tests{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+
+.grid-table{width:100%;border-collapse:collapse;}
+.grid-table thead th{
+  text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text-sub);
+  padding:9px 10px;background:#F8FAFC;border-bottom:1px solid var(--border);position:sticky;top:0;
+}
+.grid-table tbody td{padding:0;border-bottom:1px solid var(--border);}
+.grid-table tbody tr:hover td{background:#F8FAFC;}
+.grid-cell{padding:9px 10px;font-size:13px;width:100%;border:none;background:transparent;outline:none;border-radius:4px;}
+.grid-cell:focus{background:var(--primary-50);box-shadow:0 0 0 2px var(--primary-100) inset;}
+.grid-table td.test-name{font-weight:600;}
+.grid-table td.unit-col,.grid-table td.ref-col{color:var(--text-sub);}
+.flag-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;display:inline-block;}
+.row-add{display:flex;align-items:center;gap:8px;padding:10px;color:var(--text-sub);font-size:12.5px;font-weight:600;border-top:1px dashed var(--border);}
+.row-add:hover{color:var(--primary);cursor:pointer;}
+
+.mini-list{display:flex;flex-direction:column;gap:0;}
+.mini-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+.mini-row:last-child{border-bottom:none;}
+.mini-row .name{font-weight:600;}
+.mini-row .sub{color:var(--text-faint);font-size:11.5px;}
+
+.preview-thumb{aspect-ratio:210/297;background:var(--card);border:1px solid var(--border);border-radius:6px;
+  display:flex;flex-direction:column;padding:14px;gap:6px;box-shadow:var(--shadow-sm);}
+.preview-thumb .pl{height:8px;background:#EEF2F7;border-radius:2px;}
+.preview-thumb .pl.w60{width:60%;}
+.preview-thumb .pl.w80{width:80%;}
+.preview-thumb .pl.w40{width:40%;}
+.preview-thumb .hdr-block{height:30px;border:1px dashed var(--border-strong);border-radius:4px;margin-bottom:6px;}
+
+.summary-stat{display:flex;flex-direction:column;gap:2px;}
+.summary-stat .val{font-size:20px;font-weight:800;}
+.summary-stat .lbl{font-size:11px;color:var(--text-sub);font-weight:600;}
+.summary-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+/* =====================================================================
+   SCREEN 3 — TEST BUILDER  /  SCREEN 6 — SETTINGS  (shared 3-col app shell)
+===================================================================== */
+.app-shell{height:calc(100vh - 46px);display:flex;flex-direction:column;}
+.app-shell .topmenu{flex:none;}
+.shell-body{flex:1;display:flex;overflow:hidden;}
+.shell-sidebar{width:230px;flex:none;background:var(--card);border-right:1px solid var(--border);padding:16px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;}
+.shell-center{flex:1;padding:22px 28px;overflow-y:auto;}
+.shell-right{width:340px;flex:none;border-left:1px solid var(--border);background:#FBFCFE;padding:18px;overflow-y:auto;}
+
+.cat-group .label{font-size:11px;font-weight:700;text-transform:uppercase;color:var(--text-faint);letter-spacing:.05em;padding:0 8px 6px;}
+.cat-item{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;border-radius:7px;font-size:13px;font-weight:600;color:var(--text-sub);}
+.cat-item:hover{background:#F1F5F9;cursor:pointer;}
+.cat-item.active{background:var(--primary-50);color:var(--primary-dark);}
+.cat-item .count{font-size:11px;color:var(--text-faint);background:#F1F5F9;padding:1px 7px;border-radius:10px;}
+.cat-item.active .count{background:white;color:var(--primary);}
+
+.builder-form{display:flex;flex-direction:column;gap:16px;max-width:560px;}
+.formula-box{font-family:'JetBrains Mono',monospace;font-size:12.5px;min-height:70px;resize:vertical;}
+.builder-actions{display:flex;gap:8px;padding-top:6px;border-top:1px solid var(--border);margin-top:4px;}
+
+.live-preview-card{padding:18px;}
+.lp-test-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--border);}
+.lp-test-row .n{font-weight:700;font-size:13px;}
+.lp-test-row .v{font-family:'JetBrains Mono',monospace;font-size:13px;}
+.lp-test-row .r{font-size:11px;color:var(--text-faint);}
+
+/* Doctor Builder table */
+.doctor-table{width:100%;border-collapse:collapse;}
+.doctor-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-sub);padding:10px 12px;border-bottom:1px solid var(--border);}
+.doctor-table td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;}
+.doctor-table tr:hover td{background:#F8FAFC;}
+.doctor-table .actions{display:flex;gap:6px;justify-content:flex-end;}
+
+/* =====================================================================
+   SCREEN 5 — PRINT PREVIEW
+===================================================================== */
+#screen-print{height:calc(100vh - 46px);display:flex;flex-direction:column;background:var(--bg);}
+.print-toolbar{height:52px;flex:none;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 18px;gap:8px;}
+.print-toolbar .grp{display:flex;gap:4px;padding-right:10px;border-right:1px solid var(--border);margin-right:6px;}
+.print-toolbar .grp:last-child{border-right:none;}
+.print-toolbar .spacer{flex:1;}
+.print-stage{flex:1;display:flex;justify-content:center;align-items:flex-start;padding:32px;overflow:auto;}
+.a4{width:620px;aspect-ratio:210/297;background:white;box-shadow:var(--shadow-lg);position:relative;display:flex;flex-direction:column;border-radius:2px;}
+.a4-header{height:13%;flex:none;border-bottom:2px dashed #FCA5A5;background:repeating-linear-gradient(135deg,#FEF2F2,#FEF2F2 8px,#FFF 8px,#FFF 16px);
+  display:flex;align-items:center;justify-content:center;color:#DC2626;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.a4-footer{height:8%;flex:none;border-top:2px dashed #FCA5A5;background:repeating-linear-gradient(135deg,#FEF2F2,#FEF2F2 8px,#FFF 8px,#FFF 16px);
+  display:flex;align-items:center;justify-content:center;color:#DC2626;font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.a4-content{flex:1;padding:18px 22px;display:flex;flex-direction:column;gap:10px;overflow:hidden;}
+.dyn-block{border:1.5px solid var(--primary-100);border-radius:6px;padding:10px 12px;position:relative;background:var(--primary-50);transition:border-color .14s var(--ease);}
+.dyn-block:hover{border-color:var(--primary);}
+.dyn-block .blabel{position:absolute;top:-9px;left:10px;background:var(--primary);color:white;font-size:9px;font-weight:700;padding:1px 7px;border-radius:4px;letter-spacing:.03em;}
+.dyn-block .bl{height:7px;background:#DCE7FB;border-radius:2px;margin-top:5px;}
+.dyn-block .bl.w70{width:70%;}.dyn-block .bl.w50{width:50%;}.dyn-block .bl.w90{width:90%;}
+.dyn-block.plain{background:#F8FAFC;border-color:var(--border);border-style:dashed;}
+.dyn-block.plain .blabel{background:var(--text-sub);}
+.print-side{width:280px;flex:none;border-left:1px solid var(--border);background:var(--card);padding:18px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
+.print-page-indicator{display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;color:var(--text-sub);font-weight:600;padding-top:10px;}
+
+/* =====================================================================
+   SCREEN 6 — SETTINGS specifics
+===================================================================== */
+.settings-section{display:flex;flex-direction:column;gap:18px;max-width:620px;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);}
+.setting-row:last-child{border-bottom:none;}
+.setting-row .meta .t{font-weight:600;font-size:13.5px;margin-bottom:2px;}
+.setting-row .meta .d{font-size:12px;color:var(--text-sub);}
+.toggle{width:40px;height:23px;border-radius:20px;background:var(--border-strong);position:relative;border:none;transition:background .15s var(--ease);flex:none;}
+.toggle.on{background:var(--primary);}
+.toggle::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;background:white;border-radius:50%;transition:transform .15s var(--ease);box-shadow:0 1px 3px rgba(0,0,0,.2);}
+.toggle.on::after{transform:translateX(17px);}
+.theme-swatches{display:flex;gap:10px;}
+.swatch{width:54px;height:38px;border-radius:7px;border:2px solid transparent;cursor:pointer;display:flex;align-items:flex-end;padding:5px;transition:border-color .12s var(--ease);}
+.swatch.selected{border-color:var(--primary);}
+
+/* Responsive floor: 1366x768 */
+@media (max-width:1400px){
+  .home-left{width:60%;} .home-right{width:40%;}
+  .shell-right{width:300px;}
+}
+@media (max-width:1380px){
+  .a4{width:480px;}
+  .print-side{width:240px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ PROTOTYPE NAVIGATOR (review aid, not part of the product) ============ -->
+<div id="protonav">
+  <span class="label">LAB REPORT SYSTEM — Wireframes</span>
+  <button data-screen="login" class="active">1 · Login</button>
+  <button data-screen="home">2 · Home</button>
+  <button data-screen="testbuilder">3 · Test Builder</button>
+  <button data-screen="doctorbuilder">4 · Doctor Builder</button>
+  <button data-screen="print">5 · Print Preview</button>
+  <button data-screen="settings">6 · Settings</button>
+  <div class="spacer"></div>
+  <span class="pill">1920×1080 · min 1366×768</span>
+</div>
+
+<div class="app-stage">
+
+<!-- =====================================================================
+SCREEN 1 — LOGIN
+===================================================================== -->
+<section id="screen-login" class="screen active">
+  <div class="login-shell">
+    <div class="card login-card">
+      <div class="login-logo">LR</div>
+      <h1>Lab Report System</h1>
+      <p class="sub">Sign in to continue to your workspace</p>
+      <div class="login-form">
+        <div class="field">
+          <label>Username</label>
+          <input type="text" placeholder="e.g. dr.sharma">
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input type="password" placeholder="••••••••">
+        </div>
+        <div class="remember-row">
+          <label class="checkbox-row"><input type="checkbox" checked> Remember this device</label>
+          <a class="forgot-link" href="#">Forgot password?</a>
+        </div>
+        <button class="btn btn-primary login-submit" onclick="goScreen('home');showToast('Welcome back — signed in successfully')">LOGIN</button>
+      </div>
+      <div class="login-meta" style="margin-top:18px;">
+        <span>Version 2.4.1</span>
+        <span class="license-ok">● License Active</span>
+      </div>
+    </div>
+
+    <div class="card rules-card">
+      <div class="rules-grid">
+        <div class="rules-col">
+          <div class="role">🛡️ Admin</div>
+          <ul>
+            <li>Full access</li>
+            <li>Manage users &amp; tests</li>
+            <li>Settings &amp; backup</li>
+          </ul>
+        </div>
+        <div class="rules-col">
+          <div class="role">🩺 Operator</div>
+          <ul>
+            <li>Create reports</li>
+            <li>Print reports</li>
+            <li>No settings access</li>
+          </ul>
+        </div>
+      </div>
+      <div class="device-lock">
+        <span>🔒</span>
+        <span>Device lock is enabled. Only registered devices can sign in to this system.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+SCREEN 2 — HOME
+===================================================================== -->
+<section id="screen-home" class="screen">
+  <div style="height:calc(100vh - 46px);display:flex;flex-direction:column;">
+    <div class="topmenu">
+      <div class="brand"><div class="sq">LR</div> Lab Report System</div>
+      <button class="menu-item">File</button>
+      <button class="menu-item" onclick="goScreen('testbuilder')">Test Builder</button>
+      <button class="menu-item" onclick="showToast('Shortcuts — Ctrl+N New · Ctrl+S Save · Ctrl+P Print · Ctrl+F Search')">Help</button>
+      <button class="menu-item" onclick="goScreen('settings')">Settings</button>
+      <div class="spacer"></div>
+      <div class="kbd-hint"><kbd>Ctrl</kbd>+<kbd>S</kbd> Save</div>
+      <div class="user-pill"><div class="user-avatar">RS</div> Dr. R. Sharma <span class="tag tag-muted">Admin</span></div>
+    </div>
+
+    <div class="tabbar">
+      <button class="ptab active">Anita Verma <span class="x">×</span></button>
+      <button class="ptab">Mohit Sinha <span class="x">×</span></button>
+      <button class="ptab">Kavya Iyer <span class="x">×</span></button>
+      <button class="tab-add" onclick="showToast('New patient tab created')">+</button>
+    </div>
+
+    <div class="home-body">
+      <div class="home-left">
+
+        <div class="card panel">
+          <div class="panel-head">
+            <span class="section-title">Patient Details</span>
+            <span class="tag tag-success">Registered</span>
+          </div>
+          <div class="patient-grid">
+            <div class="field"><label>Name</label><input type="text" value="Anita Verma"></div>
+            <div class="field"><label>Age</label><input type="number" value="34"></div>
+            <div class="field"><label>Sex</label>
+              <select><option>Female</option><option>Male</option><option>Other</option></select>
+            </div>
+          </div>
+          <div class="patient-grid-3">
+            <div class="field"><label>Doctor</label>
+              <select><option>Dr. N. Kapoor — MD Pathology</option><option>Dr. S. Mehta — MBBS</option><option>Dr. A. Rao — MD Biochem</option></select>
+            </div>
+            <div class="field"><label>Registration Date</label><input type="date" value="2026-06-22"></div>
+            <div class="field"><label>Report Date</label><input type="date" value="2026-06-22"></div>
+          </div>
+          <div class="field"><label>Reference By</label><input type="text" placeholder="Referring clinic / physician"></div>
+        </div>
+
+        <div class="card panel">
+          <div class="panel-head"><span class="section-title">Quick Tests</span></div>
+          <div class="quick-tests">
+            <button class="chip active" onclick="this.classList.toggle('active')"><span class="dot"></span>CBC</button>
+            <button class="chip active" onclick="this.classList.toggle('active')"><span class="dot"></span>LFT</button>
+            <button class="chip" onclick="this.classList.toggle('active')">Sugar</button>
+            <button class="chip" onclick="this.classList.toggle('active')">Lipid</button>
+            <button class="chip" onclick="this.classList.toggle('active')">Urine</button>
+            <button class="chip" style="border-style:dashed;color:var(--primary);" onclick="showToast('Opening full test catalogue…')">+ More Tests</button>
+          </div>
+        </div>
+
+        <div class="card panel" style="flex:1;">
+          <div class="panel-head">
+            <span class="section-title">Results Grid</span>
+            <button class="btn btn-sm" onclick="showToast('Row added to results grid')">+ Add Row</button>
+          </div>
+          <table class="grid-table">
+            <thead><tr><th style="width:30%">Test</th><th style="width:18%">Result</th><th style="width:14%">Unit</th><th style="width:24%">Reference</th><th style="width:14%">Flag</th></tr></thead>
+            <tbody>
+              <tr><td class="test-name"><input class="grid-cell" value="Haemoglobin"></td><td><input class="grid-cell mono" value="13.8"></td><td class="unit-col"><input class="grid-cell" value="g/dL"></td><td class="ref-col"><input class="grid-cell" value="13.0 – 17.0"></td><td><span class="flag-badge tag-success">Normal</span></td></tr>
+              <tr><td class="test-name"><input class="grid-cell" value="WBC Count"></td><td><input class="grid-cell mono" value="11.4"></td><td class="unit-col"><input class="grid-cell" value="×10³/µL"></td><td class="ref-col"><input class="grid-cell" value="4.0 – 11.0"></td><td><span class="flag-badge tag-warning">High</span></td></tr>
+              <tr><td class="test-name"><input class="grid-cell" value="Platelet Count"></td><td><input class="grid-cell mono" value="245"></td><td class="unit-col"><input class="grid-cell" value="×10³/µL"></td><td class="ref-col"><input class="grid-cell" value="150 – 410"></td><td><span class="flag-badge tag-success">Normal</span></td></tr>
+              <tr><td class="test-name"><input class="grid-cell" value="SGPT (ALT)"></td><td><input class="grid-cell mono" value="58"></td><td class="unit-col"><input class="grid-cell" value="U/L"></td><td class="ref-col"><input class="grid-cell" value="7 – 40"></td><td><span class="flag-badge tag-danger">High</span></td></tr>
+              <tr><td class="test-name"><input class="grid-cell" value="Bilirubin (Total)"></td><td><input class="grid-cell mono" value="0.9"></td><td class="unit-col"><input class="grid-cell" value="mg/dL"></td><td class="ref-col"><input class="grid-cell" value="0.2 – 1.2"></td><td><span class="flag-badge tag-success">Normal</span></td></tr>
+            </tbody>
+          </table>
+          <div class="row-add" onclick="showToast('Row added to results grid')">+ Add empty row</div>
+        </div>
+      </div>
+
+      <div class="home-right">
+        <div class="card panel">
+          <span class="section-title">Selected Tests</span>
+          <div class="mini-list">
+            <div class="mini-row"><span class="name">CBC <span class="sub">· 5 parameters</span></span><span class="tag tag-success">Ready</span></div>
+            <div class="mini-row"><span class="name">LFT <span class="sub">· 6 parameters</span></span><span class="tag tag-warning">1 flag</span></div>
+          </div>
+        </div>
+
+        <div class="card panel">
+          <div class="panel-head"><span class="section-title">Preview</span><button class="btn btn-sm" onclick="goScreen('print')">Open</button></div>
+          <div class="preview-thumb">
+            <div class="hdr-block"></div>
+            <div class="pl w60"></div><div class="pl w40"></div>
+            <div class="pl w80" style="margin-top:8px;"></div><div class="pl w80"></div><div class="pl w60"></div>
+            <div class="pl w80" style="margin-top:8px;"></div><div class="pl w40"></div>
+          </div>
+        </div>
+
+        <div class="card panel">
+          <span class="section-title">Patient Summary</span>
+          <div class="summary-row">
+            <div class="summary-stat"><div class="val">11</div><div class="lbl">Total Reports</div></div>
+            <div class="summary-stat"><div class="val">2</div><div class="lbl">Pending Flags</div></div>
+          </div>
+        </div>
+
+        <div class="card panel">
+          <span class="section-title">Recent Reports</span>
+          <div class="mini-list">
+            <div class="mini-row"><span class="name">CBC + LFT <span class="sub">· Today</span></span><span class="sub">#RPT-2291</span></div>
+            <div class="mini-row"><span class="name">Lipid Profile <span class="sub">· 3 days ago</span></span><span class="sub">#RPT-2244</span></div>
+            <div class="mini-row"><span class="name">Sugar (F/PP) <span class="sub">· 1 week ago</span></span><span class="sub">#RPT-2198</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+SCREEN 3 — TEST BUILDER
+===================================================================== -->
+<section id="screen-testbuilder" class="screen">
+  <div class="app-shell">
+    <div class="topmenu">
+      <div class="brand"><div class="sq">LR</div> Lab Report System</div>
+      <button class="menu-item" onclick="goScreen('home')">Home</button>
+      <button class="menu-item active" style="background:#F1F5F9;color:var(--text);">Test Builder</button>
+      <div class="spacer"></div>
+      <div class="user-pill"><div class="user-avatar">RS</div> Dr. R. Sharma</div>
+    </div>
+    <div class="shell-body">
+      <div class="shell-sidebar">
+        <div class="cat-group">
+          <div class="label">Categories</div>
+          <div class="cat-item active">CBC <span class="count">5</span></div>
+          <div class="cat-item">LFT <span class="count">8</span></div>
+          <div class="cat-item">Sugar <span class="count">3</span></div>
+          <div class="cat-item">Hormones <span class="count">12</span></div>
+        </div>
+        <button class="btn btn-sm" style="border-style:dashed;color:var(--primary);" onclick="showToast('New category created')">+ New Category</button>
+      </div>
+
+      <div class="shell-center">
+        <div class="panel-head" style="margin-bottom:18px;">
+          <span class="section-title" style="font-size:15px;color:var(--text);text-transform:none;">Create Test — CBC</span>
+        </div>
+        <div class="builder-form">
+          <div class="field"><label>Name</label><input id="tb-name" type="text" value="Haemoglobin" oninput="syncPreview()"></div>
+          <div class="patient-grid-2">
+            <div class="field"><label>Unit</label><input id="tb-unit" type="text" value="g/dL" oninput="syncPreview()"></div>
+            <div class="field"><label>Reference Range</label><input id="tb-ref" type="text" value="13.0 – 17.0" oninput="syncPreview()"></div>
+          </div>
+          <div class="field">
+            <label>Formula</label>
+            <textarea id="tb-formula" class="formula-box" oninput="syncPreview()">=ROUND(RBC * MCH / 10, 1)</textarea>
+            <span class="hint">Reference other test codes directly, e.g. RBC, MCH, HCT.</span>
+          </div>
+          <div class="builder-actions">
+            <button class="btn btn-primary" onclick="showToast('Test saved to CBC category')">Save</button>
+            <button class="btn" onclick="showToast('Test duplicated as “Haemoglobin (copy)”')">Duplicate</button>
+            <button class="btn btn-danger" onclick="showToast('Test deleted')">Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="shell-right">
+        <span class="section-title">Live Preview</span>
+        <div class="card live-preview-card" style="margin-top:12px;">
+          <div class="lp-test-row">
+            <span class="n" id="lp-name">Haemoglobin</span>
+            <span class="v"><span id="lp-value">13.8</span> <span id="lp-unit">g/dL</span></span>
+          </div>
+          <div class="lp-test-row" style="border-bottom:none;">
+            <span class="r">Reference: <span id="lp-ref">13.0 – 17.0</span></span>
+            <span class="tag tag-success">Normal</span>
+          </div>
+        </div>
+        <div class="card" style="margin-top:14px;padding:14px 16px;">
+          <span class="section-title">Formula Output</span>
+          <div class="mono" style="font-size:12.5px;margin-top:8px;color:var(--text-sub);">≈ 13.8 g/dL (sample input)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+SCREEN 4 — DOCTOR BUILDER
+===================================================================== -->
+<section id="screen-doctorbuilder" class="screen">
+  <div class="app-shell">
+    <div class="topmenu">
+      <div class="brand"><div class="sq">LR</div> Lab Report System</div>
+      <button class="menu-item" onclick="goScreen('home')">Home</button>
+      <button class="menu-item active" style="background:#F1F5F9;color:var(--text);">Doctor Builder</button>
+      <div class="spacer"></div>
+      <div class="user-pill"><div class="user-avatar">RS</div> Dr. R. Sharma</div>
+    </div>
+    <div class="shell-body">
+      <div class="shell-center" style="max-width:980px;display:flex;flex-direction:column;gap:20px;">
+        <div class="card panel">
+          <span class="section-title">Add / Edit Doctor</span>
+          <div class="patient-grid-3">
+            <div class="field"><label>Doctor Name</label><input type="text" placeholder="Dr. Full Name"></div>
+            <div class="field"><label>Qualification</label><input type="text" placeholder="e.g. MD Pathology"></div>
+            <div class="field"><label>Reference Number</label><input type="text" placeholder="REG-00123"></div>
+          </div>
+          <div class="builder-actions">
+            <button class="btn btn-primary" onclick="showToast('Doctor added to directory')">Add</button>
+            <button class="btn" onclick="showToast('Doctor record updated')">Edit</button>
+            <button class="btn btn-danger" onclick="showToast('Doctor removed from directory')">Delete</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <table class="doctor-table">
+            <thead><tr><th>Doctor Name</th><th>Qualification</th><th>Reference Number</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>Dr. N. Kapoor</td><td>MD Pathology</td><td class="mono">REG-00118</td>
+                <td class="actions"><button class="btn btn-sm btn-icon" title="Edit">✎</button><button class="btn btn-sm btn-icon btn-danger" title="Delete">🗑</button></td></tr>
+              <tr><td>Dr. S. Mehta</td><td>MBBS, DCH</td><td class="mono">REG-00094</td>
+                <td class="actions"><button class="btn btn-sm btn-icon" title="Edit">✎</button><button class="btn btn-sm btn-icon btn-danger" title="Delete">🗑</button></td></tr>
+              <tr><td>Dr. A. Rao</td><td>MD Biochemistry</td><td class="mono">REG-00231</td>
+                <td class="actions"><button class="btn btn-sm btn-icon" title="Edit">✎</button><button class="btn btn-sm btn-icon btn-danger" title="Delete">🗑</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+SCREEN 5 — PRINT PREVIEW
+===================================================================== -->
+<section id="screen-print" class="screen">
+  <div id="print-shell" style="height:calc(100vh - 46px);display:flex;flex-direction:column;">
+    <div class="print-toolbar">
+      <div class="grp">
+        <button class="btn btn-sm" onclick="showToast('Move tool active — drag a block to reposition')">↔ Move</button>
+        <button class="btn btn-sm" onclick="showToast('Resize tool active — drag a block edge')">⤡ Resize</button>
+      </div>
+      <div class="grp">
+        <button class="btn btn-sm" onclick="showToast('Page break inserted')">⏎ Page Break</button>
+        <button class="btn btn-sm" onclick="showToast('Block split into two')">⑃ Split</button>
+        <button class="btn btn-sm" onclick="showToast('Blocks merged')">⑂ Merge</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="grp">
+        <button class="btn btn-sm" onclick="showToast('Exporting as PDF…')">Export PDF</button>
+        <button class="btn btn-sm" onclick="showToast('Exporting as DOCX…')">Export DOCX</button>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="showToast('Sending to printer…')">🖨 Print</button>
+    </div>
+    <div style="flex:1;display:flex;overflow:hidden;">
+      <div class="print-stage">
+        <div>
+          <div class="a4">
+            <div class="a4-header">Header Reserved — Letterhead Safe Area</div>
+            <div class="a4-content">
+              <div class="dyn-block"><span class="blabel">Patient Block</span><div class="bl w70"></div><div class="bl w50"></div></div>
+              <div class="dyn-block"><span class="blabel">Results Block — CBC</span><div class="bl w90"></div><div class="bl w90"></div><div class="bl w70"></div></div>
+              <div class="dyn-block plain"><span class="blabel">Results Block — LFT</span><div class="bl w90"></div><div class="bl w50"></div></div>
+              <div class="dyn-block plain"><span class="blabel">Signature Block</span><div class="bl w50"></div></div>
+            </div>
+            <div class="a4-footer">Footer Reserved</div>
+          </div>
+          <div class="print-page-indicator">
+            <button class="btn btn-icon btn-sm">‹</button> Page 1 of 1 <button class="btn btn-icon btn-sm">›</button>
+          </div>
+        </div>
+      </div>
+      <div class="print-side">
+        <span class="section-title">Page Setup</span>
+        <div class="field"><label>Paper Size</label><select><option>A4</option><option>Letter</option></select></div>
+        <div class="field"><label>Orientation</label><select><option>Portrait</option><option>Landscape</option></select></div>
+        <hr style="border:none;border-top:1px solid var(--border);margin:6px 0;">
+        <span class="section-title">Auto Pagination</span>
+        <div class="setting-row" style="padding:8px 0;">
+          <div class="meta"><div class="t">Auto-paginate overflow</div><div class="d">Spill extra blocks to page 2+</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="setting-row" style="padding:8px 0;">
+          <div class="meta"><div class="t">Letterhead safe area</div><div class="d">Lock header / footer zones</div></div>
+          <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =====================================================================
+SCREEN 6 — SETTINGS
+===================================================================== -->
+<section id="screen-settings" class="screen">
+  <div class="app-shell">
+    <div class="topmenu">
+      <div class="brand"><div class="sq">LR</div> Lab Report System</div>
+      <button class="menu-item" onclick="goScreen('home')">Home</button>
+      <button class="menu-item active" style="background:#F1F5F9;color:var(--text);">Settings</button>
+      <div class="spacer"></div>
+      <div class="user-pill"><div class="user-avatar">RS</div> Dr. R. Sharma</div>
+    </div>
+    <div class="shell-body">
+      <div class="shell-sidebar">
+        <div class="cat-group">
+          <div class="label">Settings</div>
+          <div class="cat-item active" onclick="setSettingsTab(this,'general')">General</div>
+          <div class="cat-item" onclick="setSettingsTab(this,'backup')">Backup</div>
+          <div class="cat-item" onclick="setSettingsTab(this,'license')">License</div>
+          <div class="cat-item" onclick="setSettingsTab(this,'users')">Users</div>
+          <div class="cat-item" onclick="setSettingsTab(this,'print')">Print</div>
+          <div class="cat-item" onclick="setSettingsTab(this,'theme')">Theme</div>
+        </div>
+      </div>
+
+      <div class="shell-center">
+        <div id="settings-general" class="settings-section">
+          <span class="section-title" style="font-size:15px;color:var(--text);text-transform:none;">General</span>
+          <div class="card" style="padding:4px 18px;">
+            <div class="setting-row"><div class="meta"><div class="t">Lab Name</div><div class="d">Shown on every printed report</div></div><input type="text" value="Sharma Diagnostic Lab" style="width:220px;border:1px solid var(--border);border-radius:6px;padding:7px 10px;"></div>
+            <div class="setting-row"><div class="meta"><div class="t">Default report language</div><div class="d">Used for new reports</div></div><select style="border:1px solid var(--border);border-radius:6px;padding:7px 10px;"><option>English</option><option>Hindi</option></select></div>
+            <div class="setting-row"><div class="meta"><div class="t">Auto-save drafts</div><div class="d">Save patient entries every 30s</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+          </div>
+        </div>
+
+        <div id="settings-backup" class="settings-section" style="display:none;">
+          <span class="section-title" style="font-size:15px;color:var(--text);text-transform:none;">Backup</span>
+          <div class="card" style="padding:4px 18px;">
+            <div class="setting-row"><div class="meta"><div class="t">Automatic daily backup</div><div class="d">Last backup: today, 4:00 AM</div></div><button class="toggle on" onclick="this.classList.toggle('on')"></button></div>
+            <div class="setting-row"><div class="meta"><div class="t">Backup location</div><div class="d">D:\LabReportSystem\Backups</div></div><button class="btn btn-sm" onclick="showToast('Backup folder selector opened')">Change</button></div>
+            <div class="setting-row"><div class="meta"><div class="t">Run backup now</div><div class="d">Creates a full snapshot</div></div><button class="btn btn-sm btn-primary" onclick="showToast('Backup completed successfully')">Backup Now</button></div>
+          </div>
+        </div>
+
+        <div id="settings-license" class="settings-section" style="display:none;">
+          <span class="section-title" style="font-size:15px;color:var(--text);text-transform:none;">License</span>
+          <div class="card" style="padding:4px 18px;">
+            <div class="setting-row"><div class="meta"><div class="t">Status</div><div class="d">Valid through Dec 2026</div></div><span class="tag tag-success">Active</span></div>
+            <div class="setting-row"><div class="meta"><div class="t">Registered devices</div><div class="d">2 of 3 device slots used</div></div><button class="btn btn-sm" onclick="showToast('Device manager opened')">Manage</button></div>
+          </div>
+        </div>
+
+        <div id="settings-users" class="settings-section" style="display:none;">
+          <span class="section-title" style="font-size:15px;color:var(--text);text-transform:none;">Users</span>
+          <div class="card">
+            <table class="doctor-table">
+              <thead><tr><th>User</th><th>Role</th><th>Last Active</th><th></th></tr></thead>
+              <tbody>
+                <tr><td>Dr. R. Sharma</td><td><span class="tag tag-muted">Admin</span></td><td>Now</td><td class="actions"><button class="btn btn-sm btn-icon">✎</button></td></tr>
+                <tr><td>P. Nanda</td><td><span class="tag tag-muted">Operator</span></td><td>2h ago</td><td class="actions"><button class="btn btn-sm btn-icon">✎</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="settings-print" class="settings-section" style="display:none;">
+          <span class="section-title" style="font-size:15px;color:var(--text);text-transform:none;">Print</span>
+          <div class="card" style="padding:4px 18px;">
+            <div class="setting-row"><div class="meta"><div class="t">Default printer</div><div class="d">HP LaserJet M126 (Tray 1)</div></div><button class="btn btn-sm" onclick="showToast('Printer list opened')">Change</button></div>
+            <div class="setting-row"><div class="meta"><div class="t">Header reserved height</div><div class="d">Letterhead safe area</div></div><input type="text" value="13%" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:7px 10px;text-align:center;"></div>
+            <div class="setting-row"><div class="meta"><div class="t">Footer reserved height</div><div class="d">Signature / disclaimer area</div></div><input type="text" value="8%" style="width:80px;border:1px solid var(--border);border-radius:6px;padding:7px 10px;text-align:center;"></div>
+          </div>
+        </div>
+
+        <div id="settings-theme" class="settings-section" style="display:none;">
+          <span class="section-title" style="font-size:15px;color:var(--text);text-transform:none;">Theme</span>
+          <div class="card" style="padding:18px;">
+            <span class="section-title" style="margin-bottom:10px;display:block;">Accent Colour</span>
+            <div class="theme-swatches">
+              <div class="swatch selected" style="background:#2563EB;"></div>
+              <div class="swatch" style="background:#16A34A;"></div>
+              <div class="swatch" style="background:#F59E0B;"></div>
+              <div class="swatch" style="background:#7C3AED;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /app-stage -->
+
+<div id="toast"><span class="dot"></span><span id="toast-msg">Saved</span></div>
+
+<script>
+function goScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelectorAll('#protonav button[data-screen]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.screen===name);
+  });
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('#protonav button[data-screen]').forEach(b=>{
+  b.addEventListener('click',()=>goScreen(b.dataset.screen));
+});
+
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function syncPreview(){
+  document.getElementById('lp-name').textContent=document.getElementById('tb-name').value||'—';
+  document.getElementById('lp-unit').textContent=document.getElementById('tb-unit').value||'';
+  document.getElementById('lp-ref').textContent=document.getElementById('tb-ref').value||'—';
+}
+
+function setSettingsTab(el, key){
+  document.querySelectorAll('#screen-settings .cat-item').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  ['general','backup','license','users','print','theme'].forEach(k=>{
+    document.getElementById('settings-'+k).style.display = (k===key) ? 'flex' : 'none';
+  });
+}
+
+document.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){ e.preventDefault(); showToast('Report saved'); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='p'){ e.preventDefault(); goScreen('print'); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='n'){ e.preventDefault(); showToast('New patient tab created'); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='f'){ e.preventDefault(); showToast('Search opened'); }
+});
+
+document.querySelectorAll('.theme-swatches .swatch').forEach(s=>{
+  s.addEventListener('click',()=>{
+    document.querySelectorAll('.theme-swatches .swatch').forEach(x=>x.classList.remove('selected'));
+    s.classList.add('selected');
+    showToast('Accent colour updated');
+  });
+});
+</script>
+</body>
+</html>

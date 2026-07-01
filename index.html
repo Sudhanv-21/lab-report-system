@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Lab Report System</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark">LR</div>
+          <div>
+            <h1>Lab Report System</h1>
+            <p>Template-driven report editor</p>
+          </div>
+        </div>
+
+        <nav class="topnav">
+          <button class="nav-pill active">Report Editor</button>
+          <button class="nav-pill">Templates</button>
+          <button class="nav-pill">Settings</button>
+        </nav>
+
+        <button class="ghost-btn" id="saveBtn">Save</button>
+      </header>
+
+      <div class="tabbar" id="tabBar"></div>
+
+      <main class="content-grid">
+        <section class="editor-card">
+          <div id="editorContent"></div>
+        </section>
+
+        <aside class="sidebar">
+          <div class="card">
+            <div class="card-title">Report Summary</div>
+            <div id="summaryContent"></div>
+          </div>
+
+          <div class="card actions-card">
+            <div class="card-title">Quick actions</div>
+            <button class="primary-btn" id="addRowBtn">Add test row</button>
+            <button class="secondary-btn" id="printBtn">Print preview</button>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="preview-overlay hidden" id="previewOverlay">
+      <div class="preview-panel">
+        <header class="preview-header">
+          <div>
+            <h2>Print Preview</h2>
+            <p class="muted-text">Review the report layout before printing.</p>
+          </div>
+          <div class="preview-actions">
+            <button class="ghost-btn" id="closePreviewBtn">Close</button>
+            <button class="secondary-btn" id="exportPdfBtn">Export PDF</button>
+            <button class="primary-btn" id="printNowBtn">Print</button>
+          </div>
+        </header>
+        <div class="preview-body" id="previewBody"></div>
+      </div>
+    </div>
+  </body>
+</html>
