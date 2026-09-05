@@ -32,6 +32,11 @@ export function TemplatesView() {
     saveTemplate(clone(draft));
     setEditing(false);
   };
+  const discardDraft = () => {
+    setDraft(clone(activeTmpl));
+    setEditing(false);
+    setNewDoctorName('');
+  };
   const createDoctorTemplate = () => {
     const name = doctorName.trim();
     if (!name) return;
@@ -48,8 +53,17 @@ export function TemplatesView() {
     const doctors = Array.from(new Set([...(draft.doctors || []), doctor]));
     const next = { ...clone(draft), doctors };
     setDraft(next);
-    saveTemplate(next);
+    setEditing(true);
     setNewDoctorName('');
+  };
+  const updateDoctorName = (index, value) => {
+    const doctors = [...(draft.doctors || [])];
+    doctors[index] = value;
+    updateDraft({ doctors });
+  };
+  const removeDoctorName = (index) => {
+    const doctors = (draft.doctors || []).filter((_, doctorIndex) => doctorIndex !== index);
+    updateDraft({ doctors });
   };
   const addSection = () => {
     const section = { id: createId(), name: 'New test group', tests: [] };
@@ -88,13 +102,32 @@ export function TemplatesView() {
           <label className="doctor-template-label">Create template for</label>
           <input className="doctor-template-input" value={doctorName} onChange={(event) => setDoctorName(event.target.value)} placeholder="e.g. Dr. Sharma" />
           <button className="secondary-btn doctor-template-action" type="button" onClick={createDoctorTemplate}>Create from selected</button>
-          <label className="doctor-template-label">Add to selected template</label>
-          <input className="doctor-template-input" value={newDoctorName} onChange={(event) => setNewDoctorName(event.target.value)} placeholder="Search or add doctor" list="templateDoctorSuggestions" />
-          <datalist id="templateDoctorSuggestions">
-            {(draft.doctors || []).map((doctor) => <option key={doctor} value={doctor} />)}
-          </datalist>
-          <button className="ghost-btn doctor-template-action" type="button" onClick={addDoctorName}>Add doctor</button>
-          <div className="doctor-template-list">{(draft.doctors || []).join(', ') || 'No doctors added'}</div>
+          </div>
+          <div className="doctor-directory-panel">
+            <div className="doctor-template-heading">
+              <div>
+                <h3>Doctors</h3>
+                <p>Names available in the Ref. Doctor search.</p>
+              </div>
+              <span className="doctor-count">{(draft.doctors || []).length}</span>
+            </div>
+            <label className="doctor-template-label">Add doctor</label>
+            <input className="doctor-template-input" value={newDoctorName} onChange={(event) => setNewDoctorName(event.target.value)} placeholder="Search or add doctor" list="templateDoctorSuggestions" />
+            <datalist id="templateDoctorSuggestions">
+              {(draft.doctors || []).map((doctor) => <option key={doctor} value={doctor} />)}
+            </datalist>
+            <button className="ghost-btn doctor-template-action" type="button" onClick={addDoctorName}>Add doctor</button>
+            <div className="doctor-template-list">
+              {(draft.doctors || []).length ? draft.doctors.map((doctor, index) => (
+                <div className="doctor-template-row" key={`${doctor}-${index}`}>
+                  {editing ? (
+                    <input className="doctor-template-input" value={doctor} onChange={(event) => updateDoctorName(index, event.target.value)} />
+                  ) : <span>{doctor}</span>}
+                  {editing && <button className="doctor-template-remove" type="button" onClick={() => removeDoctorName(index)} aria-label={`Remove ${doctor}`} title={`Remove ${doctor}`}>×</button>}
+                </div>
+              )) : 'No doctors added'}
+            </div>
+            {!editing && <p className="doctor-directory-hint">Click Edit to rename or remove doctors.</p>}
           </div>
         </div>
 
@@ -103,7 +136,10 @@ export function TemplatesView() {
             {editing ? <input value={draft.name || ''} onChange={(event) => updateDraft({ name: event.target.value })} /> : <h3 style={{ margin: 0 }}>{draft.name}</h3>}
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <span className="badge" style={{ backgroundColor: 'var(--primary-soft)', color: 'var(--primary)' }}>{draft.sections?.length || 0} Test Groups</span>
-              <button className={editing ? 'primary-btn' : 'ghost-btn'} type="button" onClick={() => editing ? saveDraft() : setEditing(true)}>{editing ? 'Save' : 'Edit'}</button>
+              {editing ? <>
+                <button className="ghost-btn" type="button" onClick={discardDraft}>Discard</button>
+                <button className="primary-btn" type="button" onClick={saveDraft}>Save</button>
+              </> : <button className="ghost-btn" type="button" onClick={() => setEditing(true)}>Edit</button>}
             </div>
           </div>
 
