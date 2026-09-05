@@ -71,7 +71,7 @@ export function TemplatesView() {
   };
   const addTest = (sectionId) => {
     const section = draft.sections.find((item) => item.id === sectionId);
-    updateSection(sectionId, { tests: [...section.tests, { id: createId(), name: 'New parameter', kind: 'test', unit: '', referenceRange: '', options: [], abnormalOptions: [], criticalOptions: [], criticalLow: '', criticalHigh: '', formula: '', style: { fontSize: 14, alignment: 'left', bold: false, italic: false, underline: false }, subheading: '', subheadingStyle: { fontSize: 12, alignment: 'left', bold: false, italic: false, underline: false } }] });
+    updateSection(sectionId, { tests: [...section.tests, { id: createId(), name: 'New parameter', unit: '', referenceRange: '', options: [], abnormalOptions: [], criticalOptions: [], criticalLow: '', criticalHigh: '', formula: '' }] });
   };
 
   return (
@@ -158,6 +158,28 @@ export function TemplatesView() {
                   <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>{section.tests?.length || 0} Subtests</span>
                 </div>
 
+                {editing && <div className="template-group-style-controls">
+                  <select value={section.headingType || 'normal'} onChange={(event) => updateSection(section.id, { headingType: event.target.value })}>
+                    <option value="test">Test group name</option>
+                    <option value="normal">Normal heading</option>
+                  </select>
+                  <input type="number" min="8" max="48" placeholder="Heading size" value={section.headingStyle?.fontSize || 15} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, fontSize: Number(event.target.value) || 15 } })} />
+                  <select value={section.headingStyle?.alignment || 'left'} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, alignment: event.target.value } })}>
+                    <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
+                  </select>
+                  <label><input type="checkbox" checked={Boolean(section.headingStyle?.bold)} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, bold: event.target.checked } })} /> Bold</label>
+                  <label><input type="checkbox" checked={Boolean(section.headingStyle?.italic)} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, italic: event.target.checked } })} /> Italic</label>
+                  <label><input type="checkbox" checked={Boolean(section.headingStyle?.underline)} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, underline: event.target.checked } })} /> Underline</label>
+                  <input className="template-group-subheading" placeholder="Optional subheading under this group" value={section.subheading || ''} onChange={(event) => updateSection(section.id, { subheading: event.target.value })} />
+                  <input type="number" min="8" max="36" placeholder="Subheading size" value={section.subheadingStyle?.fontSize || 12} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, fontSize: Number(event.target.value) || 12 } })} />
+                  <select value={section.subheadingStyle?.alignment || 'left'} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, alignment: event.target.value } })}>
+                    <option value="left">Subheading left</option><option value="center">Subheading center</option><option value="right">Subheading right</option>
+                  </select>
+                  <label><input type="checkbox" checked={Boolean(section.subheadingStyle?.bold)} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, bold: event.target.checked } })} /> Subheading bold</label>
+                  <label><input type="checkbox" checked={Boolean(section.subheadingStyle?.italic)} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, italic: event.target.checked } })} /> Subheading italic</label>
+                  <label><input type="checkbox" checked={Boolean(section.subheadingStyle?.underline)} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, underline: event.target.checked } })} /> Subheading underline</label>
+                </div>}
+
                 <div className="table-responsive">
                   <table className="test-table" style={{ fontSize: '0.85rem' }}>
                     <thead><tr><th>Parameter</th><th>Unit</th><th>Reference Interval</th><th>Critical Limits / Formula</th></tr></thead>
@@ -169,33 +191,6 @@ export function TemplatesView() {
                           <td>{editing ? <textarea rows="2" value={test.referenceRange || ''} onChange={(event) => updateTest(section.id, test.id, { referenceRange: event.target.value })} /> : (test.referenceRange || '—')}</td>
                           <td>
                             {editing ? <>
-                              <select value={test.kind || 'test'} onChange={(event) => updateTest(section.id, test.id, { kind: event.target.value })}>
-                                <option value="test">Test name</option>
-                                <option value="heading">Normal heading</option>
-                              </select>
-                              <div className="template-style-grid">
-                                <input type="number" min="8" max="48" placeholder="Size" value={test.style?.fontSize || 14} onChange={(event) => updateTest(section.id, test.id, { style: { ...test.style, fontSize: Number(event.target.value) || 14 } })} />
-                                <select value={test.style?.alignment || 'left'} onChange={(event) => updateTest(section.id, test.id, { style: { ...test.style, alignment: event.target.value } })}>
-                                  <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
-                                </select>
-                              </div>
-                              <div className="template-style-toggles">
-                                <label><input type="checkbox" checked={Boolean(test.style?.bold)} onChange={(event) => updateTest(section.id, test.id, { style: { ...test.style, bold: event.target.checked } })} /> Bold</label>
-                                <label><input type="checkbox" checked={Boolean(test.style?.italic)} onChange={(event) => updateTest(section.id, test.id, { style: { ...test.style, italic: event.target.checked } })} /> Italic</label>
-                                <label><input type="checkbox" checked={Boolean(test.style?.underline)} onChange={(event) => updateTest(section.id, test.id, { style: { ...test.style, underline: event.target.checked } })} /> Underline</label>
-                              </div>
-                              <input placeholder="Optional heading under this test" value={test.subheading || ''} onChange={(event) => updateTest(section.id, test.id, { subheading: event.target.value })} />
-                              <div className="template-style-grid">
-                                <input type="number" min="8" max="36" placeholder="Subheading size" value={test.subheadingStyle?.fontSize || 12} onChange={(event) => updateTest(section.id, test.id, { subheadingStyle: { ...test.subheadingStyle, fontSize: Number(event.target.value) || 12 } })} />
-                                <select value={test.subheadingStyle?.alignment || 'left'} onChange={(event) => updateTest(section.id, test.id, { subheadingStyle: { ...test.subheadingStyle, alignment: event.target.value } })}>
-                                  <option value="left">Subheading left</option><option value="center">Subheading center</option><option value="right">Subheading right</option>
-                                </select>
-                              </div>
-                              <div className="template-style-toggles">
-                                <label><input type="checkbox" checked={Boolean(test.subheadingStyle?.bold)} onChange={(event) => updateTest(section.id, test.id, { subheadingStyle: { ...test.subheadingStyle, bold: event.target.checked } })} /> Subheading bold</label>
-                                <label><input type="checkbox" checked={Boolean(test.subheadingStyle?.italic)} onChange={(event) => updateTest(section.id, test.id, { subheadingStyle: { ...test.subheadingStyle, italic: event.target.checked } })} /> Italic</label>
-                                <label><input type="checkbox" checked={Boolean(test.subheadingStyle?.underline)} onChange={(event) => updateTest(section.id, test.id, { subheadingStyle: { ...test.subheadingStyle, underline: event.target.checked } })} /> Underline</label>
-                              </div>
                               <input placeholder="Formula" value={test.formula || ''} onChange={(event) => updateTest(section.id, test.id, { formula: event.target.value })} />
                               <input placeholder="Critical low" value={test.criticalLow || ''} onChange={(event) => updateTest(section.id, test.id, { criticalLow: event.target.value })} />
                               <input placeholder="Critical high" value={test.criticalHigh || ''} onChange={(event) => updateTest(section.id, test.id, { criticalHigh: event.target.value })} />

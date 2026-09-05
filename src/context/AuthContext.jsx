@@ -17,8 +17,29 @@ export function AuthProvider({ children }) {
   const [userProfile, setUserProfile] = useState(null);
   const sessionTimeoutRef = useRef(null);
 
+  const unlockStorageKey = (userId) => `lab-workspace-unlocked-${userId}`;
+  const getStoredUnlock = (userId) => {
+    try {
+      const storedAt = Number(sessionStorage.getItem(unlockStorageKey(userId)) || 0);
+      return storedAt > 0 && Date.now() - storedAt < SESSION_TIMEOUT_MS;
+    } catch (err) {
+      return false;
+    }
+  };
+  const rememberUnlock = (userId) => {
+    try { sessionStorage.setItem(unlockStorageKey(userId), String(Date.now())); } catch (err) {}
+  };
+  const clearRememberedUnlock = (userId) => {
+    try { sessionStorage.removeItem(unlockStorageKey(userId)); } catch (err) {}
+  };
+
   // Initialize Supabase
   useEffect(() => {
+    if (getStoredUnlock('guest')) {
+      setCurrentUser({ id: 'guest', email: 'guest@lab.local' });
+      setIsUnlocked(true);
+    }
+
     try {
       if (window.supabase && typeof window.supabase.createClient === 'function') {
         const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -100,6 +121,8 @@ export function AuthProvider({ children }) {
     const profile = await loadUserProfile(user, client);
     if (!profile?.mpin_hash) {
       setAuthStage('setup');
+    } else if (getStoredUnlock(user.id)) {
+      setIsUnlocked(true);
     } else {
       setAuthStage('mpin');
     }
@@ -112,6 +135,7 @@ export function AuthProvider({ children }) {
       const mockUser = { id: 'offline-user', email };
       setCurrentUser(mockUser);
       setIsUnlocked(true);
+      rememberUnlock(mockUser.id);
       return;
     }
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
@@ -160,6 +184,7 @@ export function AuthProvider({ children }) {
     }
 
     setIsUnlocked(true);
+    rememberUnlock(currentUser.id);
     return true;
   };
 
@@ -187,6 +212,7 @@ export function AuthProvider({ children }) {
     }
 
     setIsUnlocked(true);
+    rememberUnlock(currentUser.id);
     return true;
   };
 
@@ -196,6 +222,7 @@ export function AuthProvider({ children }) {
     }
     setCurrentUser(null);
     setIsUnlocked(false);
+    clearRememberedUnlock(currentUser?.id);
     setUserProfile(null);
     setAuthStage('credentials');
   };
@@ -219,8 +246,10 @@ export function AuthProvider({ children }) {
         saveMpin,
         signOut,
         unlockGuest: () => {
-          setCurrentUser({ id: 'guest', email: 'guest@lab.local' });
+          const guestUser = { id: 'guest', email: 'guest@lab.local' };
+          setCurrentUser(guestUser);
           setIsUnlocked(true);
+          rememberUnlock(guestUser.id);
         }
       }}
     >
