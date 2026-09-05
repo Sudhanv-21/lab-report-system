@@ -253,6 +253,36 @@ export function AppProvider({ children }) {
     );
   };
 
+  const moveSection = (sectionId, direction) => {
+    setSheets((prev) => prev.map((sheet) => {
+      if (sheet.id !== activeSheetId) return sheet;
+      const index = sheet.tests.findIndex((section) => section.id === sectionId);
+      const nextIndex = index + direction;
+      if (index < 0 || nextIndex < 0 || nextIndex >= sheet.tests.length) return sheet;
+      const nextTests = [...sheet.tests];
+      [nextTests[index], nextTests[nextIndex]] = [nextTests[nextIndex], nextTests[index]];
+      return { ...sheet, tests: nextTests };
+    }));
+  };
+
+  const moveSubtest = (componentId, testId, direction) => {
+    setSheets((prev) => prev.map((sheet) => {
+      if (sheet.id !== activeSheetId) return sheet;
+      return {
+        ...sheet,
+        tests: sheet.tests.map((component) => {
+          if (component.id !== componentId) return component;
+          const index = component.tests.findIndex((test) => test.id === testId);
+          const nextIndex = index + direction;
+          if (index < 0 || nextIndex < 0 || nextIndex >= component.tests.length) return component;
+          const nextTests = [...component.tests];
+          [nextTests[index], nextTests[nextIndex]] = [nextTests[nextIndex], nextTests[index]];
+          return { ...component, tests: nextTests };
+        })
+      };
+    }));
+  };
+
   // History operations
   const saveActiveSheetToHistory = () => {
     if (!activeSheet) return;
@@ -375,6 +405,8 @@ export function AppProvider({ children }) {
         updateTestValue,
         toggleSection,
         toggleSubtest,
+        moveSection,
+        moveSubtest,
         saveActiveSheetToHistory,
         deleteHistoryItem,
         restoreHistoryItem,

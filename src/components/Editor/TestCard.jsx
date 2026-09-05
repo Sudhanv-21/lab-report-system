@@ -7,7 +7,7 @@ import {
 } from '../../utils/clinicalCalculations.js';
 
 export function TestCard({ component }) {
-  const { activeSheet, updateTestValue, toggleSection } = useApp();
+  const { activeSheet, updateTestValue, toggleSection, moveSection, moveSubtest } = useApp();
   const gender = activeSheet?.patient?.gender || 'M';
 
   if (!component) return null;
@@ -16,11 +16,14 @@ export function TestCard({ component }) {
     <div className="card test-group-card" style={{ marginBottom: '20px' }}>
       <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h3 style={{ margin: 0 }}>{component.name}</h3>
+            <h3 style={{ margin: 0 }}>{component.name}</h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
             {component.tests?.length || 0} active parameters
           </span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <button className="ghost-btn" type="button" onClick={() => moveSection(component.id, -1)} disabled={activeSheet.tests[0]?.id === component.id} title="Move test group up" aria-label="Move test group up">↑</button>
+        <button className="ghost-btn" type="button" onClick={() => moveSection(component.id, 1)} disabled={activeSheet.tests[activeSheet.tests.length - 1]?.id === component.id} title="Move test group down" aria-label="Move test group down">↓</button>
         <button
           className="ghost-btn"
           style={{ color: 'var(--danger)', fontSize: '0.8rem' }}
@@ -29,6 +32,7 @@ export function TestCard({ component }) {
         >
           Remove Group
         </button>
+        </div>
       </div>
 
       <div className="table-responsive">
@@ -72,6 +76,10 @@ export function TestCard({ component }) {
                           ABNORMAL
                         </span>
                       )}
+                      <span style={{ display: 'inline-flex', gap: '2px', marginLeft: 'auto' }}>
+                        <button className="ghost-btn" type="button" onClick={() => moveSubtest(component.id, test.id, -1)} disabled={component.tests[0]?.id === test.id} title="Move subtest up" aria-label="Move subtest up">↑</button>
+                        <button className="ghost-btn" type="button" onClick={() => moveSubtest(component.id, test.id, 1)} disabled={component.tests[component.tests.length - 1]?.id === test.id} title="Move subtest down" aria-label="Move subtest down">↓</button>
+                      </span>
                     </div>
                   </td>
                   <td>

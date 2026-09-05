@@ -39,14 +39,24 @@ export function PatientForm() {
 
           <div className="field-group" style={{ flex: '1' }}>
             <label>Gender *</label>
-            <select
-              value={patient.gender || 'M'}
-              onChange={(e) => updateActiveSheetPatient('gender', e.target.value)}
-            >
-              <option value="M">Male (M)</option>
-              <option value="F">Female (F)</option>
-              <option value="O">Other</option>
-            </select>
+            <div role="group" aria-label="Gender" style={{ display: 'flex', gap: '6px' }}>
+              {[
+                ['M', 'Male'],
+                ['F', 'Female'],
+                ['O', 'Other']
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={`gender-option ${patient.gender === value ? 'active' : ''}`}
+                  onClick={() => updateActiveSheetPatient('gender', value)}
+                  aria-pressed={patient.gender === value}
+                  title={label}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 

@@ -10,6 +10,7 @@ export function TemplatesView() {
   const [draft, setDraft] = useState(null);
   const [editing, setEditing] = useState(false);
   const [doctorName, setDoctorName] = useState('');
+  const [newDoctorName, setNewDoctorName] = useState('');
 
   const activeTmpl = templates.find((template) => template.id === selectedTemplateId) || templates[0];
 
@@ -40,6 +41,16 @@ export function TemplatesView() {
     setDoctorName('');
     setSelectedTemplateId(next.id);
   };
+  const addDoctorName = () => {
+    const name = newDoctorName.trim();
+    if (!name) return;
+    const doctor = name.startsWith('Dr.') ? name : `Dr. ${name}`;
+    const doctors = Array.from(new Set([...(draft.doctors || []), doctor]));
+    const next = { ...clone(draft), doctors };
+    setDraft(next);
+    saveTemplate(next);
+    setNewDoctorName('');
+  };
   const addSection = () => {
     const section = { id: createId(), name: 'New test group', tests: [] };
     updateDraft({ sections: [...draft.sections, section] });
@@ -66,10 +77,25 @@ export function TemplatesView() {
               </button>
             ))}
           </div>
-          <hr style={{ border: 0, borderTop: '1px solid var(--border)', margin: '16px 0' }} />
-          <h3 style={{ fontSize: '1rem', marginBottom: '8px' }}>Doctors Templates</h3>
-          <input value={doctorName} onChange={(event) => setDoctorName(event.target.value)} placeholder="Doctor name" />
-          <button className="secondary-btn" type="button" style={{ width: '100%', marginTop: '8px' }} onClick={createDoctorTemplate}>Create from selected</button>
+          <div className="doctor-template-panel">
+          <div className="doctor-template-heading">
+            <div>
+              <h3>Doctors Templates</h3>
+              <p>Create a doctor-specific copy or add a doctor to this template.</p>
+            </div>
+            <span className="doctor-template-mark">DR</span>
+          </div>
+          <label className="doctor-template-label">Create template for</label>
+          <input className="doctor-template-input" value={doctorName} onChange={(event) => setDoctorName(event.target.value)} placeholder="e.g. Dr. Sharma" />
+          <button className="secondary-btn doctor-template-action" type="button" onClick={createDoctorTemplate}>Create from selected</button>
+          <label className="doctor-template-label">Add to selected template</label>
+          <input className="doctor-template-input" value={newDoctorName} onChange={(event) => setNewDoctorName(event.target.value)} placeholder="Search or add doctor" list="templateDoctorSuggestions" />
+          <datalist id="templateDoctorSuggestions">
+            {(draft.doctors || []).map((doctor) => <option key={doctor} value={doctor} />)}
+          </datalist>
+          <button className="ghost-btn doctor-template-action" type="button" onClick={addDoctorName}>Add doctor</button>
+          <div className="doctor-template-list">{(draft.doctors || []).join(', ') || 'No doctors added'}</div>
+          </div>
         </div>
 
         <div className="template-details card">
