@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext.jsx';
 import {
   isAbnormalResult,
@@ -9,6 +9,7 @@ import { formatSavedAt } from '../../utils/formatters.js';
 
 export function PrintPreviewModal() {
   const { previewReport, setPreviewReport, settings } = useApp();
+  const [includeUnitsAsSeparateField, setIncludeUnitsAsSeparateField] = useState(false);
 
   if (!previewReport) return null;
 
@@ -30,6 +31,14 @@ export function PrintPreviewModal() {
             </p>
           </div>
           <div className="preview-actions" style={{ display: 'flex', gap: '8px' }}>
+            <label className="print-unit-toggle">
+              <input
+                type="checkbox"
+                checked={includeUnitsAsSeparateField}
+                onChange={(event) => setIncludeUnitsAsSeparateField(event.target.checked)}
+              />
+              Include units as separate field
+            </label>
             <button className="ghost-btn" onClick={() => setPreviewReport(null)}>
               Close
             </button>
@@ -49,13 +58,13 @@ export function PrintPreviewModal() {
 
           {/* Patient Metadata Grid */}
           <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '16px', fontSize: '0.9rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px 24px', border: '1px solid #d7e3ee', padding: '12px', borderRadius: '6px' }}>
-              <div><strong>Patient Name:</strong> {patient?.name || '—'}</div>
-              <div><strong>Sample Date:</strong> {patient?.sampleCollectedAt ? patient.sampleCollectedAt.replace('T', ' ') : '—'}</div>
-              <div><strong>Age / Gender:</strong> {patient?.age || '—'} / {gender === 'F' ? 'Female' : gender === 'O' ? 'Other' : 'Male'}</div>
-              <div><strong>Report Date:</strong> {patient?.reportDate || (savedAt ? formatSavedAt(savedAt) : '—')}</div>
-              <div><strong>Ref. By Doctor:</strong> {patient?.doctor || 'Self'}</div>
-              <div><strong>Report ID:</strong> {previewReport.historyId || previewReport.id || 'LR-TEMP'}</div>
+            <div className="print-patient-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(220px, 0.75fr)', gap: '8px 24px', border: '1px solid #d7e3ee', padding: '12px', borderRadius: '6px' }}>
+              <div className="print-meta-left"><strong>Patient Name:</strong> {patient?.name || '—'}</div>
+              <div className="print-meta-right"><strong>Sample Date:</strong> {patient?.sampleCollectedAt ? patient.sampleCollectedAt.replace('T', ' ') : '—'}</div>
+              <div className="print-meta-left"><strong>Age / Gender:</strong> {patient?.age || '—'} / {gender === 'F' ? 'Female' : gender === 'O' ? 'Other' : 'Male'}</div>
+              <div className="print-meta-right"><strong>Report Date:</strong> {patient?.reportDate || (savedAt ? formatSavedAt(savedAt) : '—')}</div>
+              <div className="print-meta-left"><strong>Ref. By Doctor:</strong> {patient?.doctor || 'Self'}</div>
+              <div className="print-meta-right"><strong>Report ID:</strong> {previewReport.historyId || previewReport.id || 'LR-TEMP'}</div>
             </div>
           </div>
 
@@ -63,23 +72,23 @@ export function PrintPreviewModal() {
           <div className="print-tests-container">
             <table className="print-results-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '0.88rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #d7e3ee', textAlign: 'left', color: '#5d7287' }}>
-                  <th style={{ padding: '6px', width: '38%' }}>Test / Parameter</th>
-                  <th style={{ padding: '6px', width: '22%' }}>Observed Value</th>
-                  <th style={{ padding: '6px', width: '15%' }}>Unit</th>
-                  <th style={{ padding: '6px', width: '25%' }}>Biological Ref. Interval</th>
+                <tr style={{ textAlign: 'left', color: '#5d7287' }}>
+                  <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '38%' : '42%' }}>Test / Parameter</th>
+                  <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '22%' : '28%' }}>Result Value</th>
+                  {includeUnitsAsSeparateField && <th style={{ padding: '6px', width: '15%' }}>Unit</th>}
+                  <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '25%' : '30%' }}>Biological Ref. Range</th>
                 </tr>
               </thead>
               <tbody>
                 {tests?.map((group) => (
                   <React.Fragment key={group.id}>
                     <tr className="print-main-heading-row">
-                      <td colSpan="4" style={{ padding: '10px 6px 4px', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
+                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '10px 6px 4px', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
                         {group.name}
                       </td>
                     </tr>
                     {group.subheading && <tr className="print-subheading-row">
-                      <td colSpan="4" style={{ padding: '0 6px 7px', color: '#5d7287', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
+                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '0 6px 7px', color: '#5d7287', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
                         {group.subheading}
                       </td>
                     </tr>}
@@ -98,10 +107,10 @@ export function PrintPreviewModal() {
                       };
 
                       return (
-                        <tr key={t.id} style={{ borderBottom: '1px solid #edf3f6' }}>
+                        <tr key={t.id}>
                           <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle }}>{t.name}</td>
-                          <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
-                          <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>
+                          <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'}{!includeUnitsAsSeparateField && t.unit ? ` ${t.unit}` : ''} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
+                          {includeUnitsAsSeparateField && <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>}
                           <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{genderRange || t.referenceRange || '—'}</td>
                         </tr>
                       );
@@ -117,7 +126,7 @@ export function PrintPreviewModal() {
             *** END OF REPORT ***
           </div>
 
-          <div className="print-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', paddingTop: '10px' }}>
+          <footer className="print-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', paddingTop: '10px' }}>
             <div style={{ fontSize: '0.8rem', color: '#5d7287' }}>
               <div>Printed: {new Date().toLocaleString()}</div>
               <div>Report generated by Arun Clinical Lab</div>
@@ -132,10 +141,10 @@ export function PrintPreviewModal() {
                 />
               )}
               <div style={{ borderTop: '1px solid #000', width: '180px', paddingTop: '4px', fontWeight: '600', fontSize: '0.85rem' }}>
-                Medical Lab Technologist / Pathologist
+                Signature
               </div>
             </div>
-          </div>
+          </footer>
 
           {settings.footerSpacing > 0 && (
             <div style={{ height: `${settings.footerSpacing}px` }} />

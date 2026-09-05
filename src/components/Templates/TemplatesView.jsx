@@ -40,8 +40,7 @@ export function TemplatesView() {
   const createDoctorTemplate = () => {
     const name = doctorName.trim();
     if (!name) return;
-    const doctor = name.startsWith('Dr.') ? name : `Dr. ${name}`;
-    const next = { ...clone(draft), id: `doctor-${createId()}`, name: `${doctor} Template`, forDoctor: doctor, doctors: [doctor] };
+    const next = { ...clone(draft), id: `doctor-${createId()}`, name: `${name} Template`, forDoctor: name, doctors: [name] };
     saveTemplate(next);
     setDoctorName('');
     setSelectedTemplateId(next.id);
@@ -49,8 +48,7 @@ export function TemplatesView() {
   const addDoctorName = () => {
     const name = newDoctorName.trim();
     if (!name) return;
-    const doctor = name.startsWith('Dr.') ? name : `Dr. ${name}`;
-    const doctors = Array.from(new Set([...(draft.doctors || []), doctor]));
+    const doctors = Array.from(new Set([...(draft.doctors || []), name]));
     const next = { ...clone(draft), doctors };
     setDraft(next);
     setEditing(true);
@@ -72,6 +70,10 @@ export function TemplatesView() {
   const addTest = (sectionId) => {
     const section = draft.sections.find((item) => item.id === sectionId);
     updateSection(sectionId, { tests: [...section.tests, { id: createId(), name: 'New parameter', unit: '', referenceRange: '', options: [], abnormalOptions: [], criticalOptions: [], criticalLow: '', criticalHigh: '', formula: '' }] });
+  };
+  const removeTest = (sectionId, testId) => {
+    const section = draft.sections.find((item) => item.id === sectionId);
+    updateSection(sectionId, { tests: section.tests.filter((test) => test.id !== testId) });
   };
 
   return (
@@ -182,7 +184,7 @@ export function TemplatesView() {
 
                 <div className="table-responsive">
                   <table className="test-table" style={{ fontSize: '0.85rem' }}>
-                    <thead><tr><th>Parameter</th><th>Unit</th><th>Reference Interval</th><th>Critical Limits / Formula</th></tr></thead>
+                    <thead><tr><th>Parameter</th><th>Unit</th><th>Reference Interval</th><th>Critical Limits / Formula</th>{editing && <th aria-label="Actions" />}</tr></thead>
                     <tbody>
                       {section.tests?.map((test) => (
                         <tr key={test.id}>
@@ -202,6 +204,7 @@ export function TemplatesView() {
                               {!test.formula && !test.criticalLow && !test.criticalHigh && '—'}
                             </>}
                           </td>
+                          {editing && <td><button className="doctor-template-remove" type="button" onClick={() => removeTest(section.id, test.id)} aria-label={`Remove ${test.name || 'parameter'}`} title="Remove parameter">×</button></td>}
                         </tr>
                       ))}
                     </tbody>
