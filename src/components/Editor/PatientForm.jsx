@@ -78,19 +78,21 @@ export function PatientForm() {
           </div>
         </div>
 
-        <div className="field-row">
-          <div className="field-group" style={{ flex: '1' }}>
+        <div className="field-row patient-date-row">
+          <div className="field-group patient-date-field">
             <label>Sample Date & Time</label>
             <input
+              className="patient-date-input"
               type="datetime-local"
               value={patient.sampleCollectedAt || ''}
               onChange={(e) => updateActiveSheetPatient('sampleCollectedAt', e.target.value)}
             />
           </div>
 
-          <div className="field-group" style={{ flex: '1' }}>
+          <div className="field-group patient-date-field">
             <label>Report Date</label>
             <input
+              className="patient-date-input"
               type="date"
               value={patient.reportDate || ''}
               onChange={(e) => updateActiveSheetPatient('reportDate', e.target.value)}

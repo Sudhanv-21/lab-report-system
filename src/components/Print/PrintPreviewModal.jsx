@@ -75,22 +75,28 @@ export function PrintPreviewModal() {
 
           {/* Tests Table */}
           <div className="print-tests-container">
-            {tests?.map((group, groupIndex) => (
-              <div key={group.id} className="print-test-group" style={{ marginBottom: '16px' }}>
-                <div style={{ backgroundColor: '#f1f7ff', padding: '6px 10px', fontWeight: '700', fontSize: '0.95rem', borderLeft: '4px solid #0d5ec9', marginBottom: '6px' }}>
-                  {group.name}
-                </div>
-
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
-                  {groupIndex === 0 && <thead>
-                    <tr style={{ borderBottom: '1px solid #d7e3ee', textAlign: 'left', color: '#5d7287' }}>
-                      <th style={{ padding: '6px', width: '38%' }}>Test / Parameter</th>
-                      <th style={{ padding: '6px', width: '22%' }}>Observed Value</th>
-                      <th style={{ padding: '6px', width: '15%' }}>Unit</th>
-                      <th style={{ padding: '6px', width: '25%' }}>Biological Ref. Interval</th>
+            <table className="print-results-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '0.88rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid #d7e3ee', textAlign: 'left', color: '#5d7287' }}>
+                  <th style={{ padding: '6px', width: '38%' }}>Test / Parameter</th>
+                  <th style={{ padding: '6px', width: '22%' }}>Observed Value</th>
+                  <th style={{ padding: '6px', width: '15%' }}>Unit</th>
+                  <th style={{ padding: '6px', width: '25%' }}>Biological Ref. Interval</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tests?.map((group) => (
+                  <React.Fragment key={group.id}>
+                    <tr className="print-main-heading-row">
+                      <td colSpan="4" style={{ padding: '10px 6px 4px', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
+                        {group.name}
+                      </td>
                     </tr>
-                  </thead>}
-                  <tbody>
+                    {group.subheading && <tr className="print-subheading-row">
+                      <td colSpan="4" style={{ padding: '0 6px 7px', color: '#5d7287', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
+                        {group.subheading}
+                      </td>
+                    </tr>}
                     {group.tests?.map((t) => {
                       const abnormal = isAbnormalResult(t, gender);
                       const critical = isCriticalResult(t, gender);
@@ -105,47 +111,19 @@ export function PrintPreviewModal() {
                         textDecoration: style.underline ? 'underline' : 'none'
                       };
 
-                      if (t.kind === 'heading' || t.isHeading) {
-                        return (
-                          <tr key={t.id} style={{ borderBottom: '1px solid #edf3f6' }}>
-                            <td colSpan="4" style={{ padding: '8px 6px', ...textStyle }}>{t.name}</td>
-                          </tr>
-                        );
-                      }
-
-                      const subheadingStyle = t.subheadingStyle || {};
-                      const subheadingCss = {
-                        fontSize: `${subheadingStyle.fontSize || 12}px`,
-                        textAlign: subheadingStyle.alignment || 'left',
-                        fontWeight: subheadingStyle.bold ? '700' : 'normal',
-                        fontStyle: subheadingStyle.italic ? 'italic' : 'normal',
-                        textDecoration: subheadingStyle.underline ? 'underline' : 'none'
-                      };
-
                       return (
-                        <React.Fragment key={t.id}>
-                          <tr style={{ borderBottom: '1px solid #edf3f6' }}>
-                            <td style={{ padding: '6px', ...textStyle }}>
-                              {t.name}
-                            </td>
-                            <td style={{ padding: '6px', ...textStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>
-                              {t.value || '—'} {critical ? ' (Critical)' : abnormal ? ' *' : ''}
-                            </td>
-                            <td style={{ padding: '6px', color: '#5d7287' }}>{t.unit || '—'}</td>
-                            <td style={{ padding: '6px', color: '#5d7287', whiteSpace: 'pre-line' }}>
-                              {genderRange || t.referenceRange || '—'}
-                            </td>
-                          </tr>
-                          {t.subheading && <tr className="print-subheading-row">
-                            <td colSpan="4" style={{ padding: '2px 6px 7px', color: '#5d7287', ...subheadingCss }}>{t.subheading}</td>
-                          </tr>}
-                        </React.Fragment>
+                        <tr key={t.id} style={{ borderBottom: '1px solid #edf3f6' }}>
+                          <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle }}>{t.name}</td>
+                          <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
+                          <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>
+                          <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{genderRange || t.referenceRange || '—'}</td>
+                        </tr>
                       );
                     })}
-                  </tbody>
-                </table>
-              </div>
-            ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           {/* End of Report & Signatures */}

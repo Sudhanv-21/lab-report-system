@@ -37,6 +37,18 @@ export function getLocalDateValue(date = new Date()) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+export function getIndiaDateTimeValue(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, '0');
+  const indiaTime = new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
+  return `${indiaTime.getUTCFullYear()}-${pad(indiaTime.getUTCMonth() + 1)}-${pad(indiaTime.getUTCDate())}T${pad(indiaTime.getUTCHours())}:${pad(indiaTime.getUTCMinutes())}`;
+}
+
+export function getIndiaDateValue(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, '0');
+  const indiaTime = new Date(date.getTime() + (5.5 * 60 * 60 * 1000));
+  return `${indiaTime.getUTCFullYear()}-${pad(indiaTime.getUTCMonth() + 1)}-${pad(indiaTime.getUTCDate())}`;
+}
+
 export function formatCurrency(amount) {
   const num = parseFloat(amount) || 0;
   return `₹${num.toFixed(2)}`;
