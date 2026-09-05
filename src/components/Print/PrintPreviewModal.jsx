@@ -133,14 +133,7 @@ export function PrintPreviewModal() {
             </div>
 
             <div style={{ textAlign: 'center' }}>
-              {settings.signatureImage && (
-                <img
-                  src={settings.signatureImage}
-                  alt="Pathologist Signature"
-                  style={{ maxHeight: '60px', marginBottom: '4px' }}
-                />
-              )}
-              <div style={{ borderTop: '1px solid #000', width: '180px', paddingTop: '4px', fontWeight: '600', fontSize: '0.85rem' }}>
+              <div style={{ borderTop: '1px solid #000', width: '180px', minHeight: '34px', paddingTop: '4px', fontWeight: '600', fontSize: '0.85rem' }}>
                 Signature
               </div>
             </div>
