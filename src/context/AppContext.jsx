@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { DEFAULT_TEMPLATES } from '../data/defaultTemplates.js';
-import { createId } from '../utils/formatters.js';
+import { createId, getLocalDateTimeValue, getLocalDateValue } from '../utils/formatters.js';
 import { recalculateComponentFormulas } from '../utils/clinicalCalculations.js';
 import { useAuth } from './AuthContext.jsx';
 
@@ -19,8 +19,8 @@ export function makeEmptySheet(template = DEFAULT_TEMPLATES[0]) {
       age: '',
       gender: 'M',
       doctor: template.doctors?.[0] || 'Dr. Self',
-      sampleCollectedAt: new Date().toISOString().slice(0, 16),
-      reportDate: new Date().toISOString().slice(0, 10),
+      sampleCollectedAt: getLocalDateTimeValue(),
+      reportDate: getLocalDateValue(),
       notes: ''
     },
     tests: clonedSections,
