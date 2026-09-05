@@ -40,26 +40,8 @@ export function PrintPreviewModal() {
         </header>
 
         <div className="preview-body" id="printableReport">
-          {/* Top Letterhead Spacing if configured */}
-          {settings.letterheadSpacing > 0 ? (
-            <div style={{ height: `${settings.letterheadSpacing}px` }} />
-          ) : (
-            <div className="print-lab-header">
-              <div style={{ textAlign: 'center', borderBottom: '2px solid #163256', paddingBottom: '12px', marginBottom: '16px' }}>
-                <h1 style={{ margin: 0, fontSize: '1.8rem', color: '#163256', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  {settings.labName || 'Arun Clinical Lab'}
-                </h1>
-                <p style={{ margin: '4px 0 0', fontSize: '0.9rem', color: '#5d7287' }}>
-                  {settings.labTagline || 'Diagnostics & pathology reporting'}
-                </p>
-                {(settings.address || settings.phone) && (
-                  <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#5d7287' }}>
-                    {[settings.address, settings.phone, settings.email].filter(Boolean).join(' | ')}
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+          {/* Keep the configurable blank letterhead space without printing lab branding. */}
+          {settings.letterheadSpacing > 0 && <div style={{ height: `${settings.letterheadSpacing}px` }} />}
 
           {/* Patient Metadata Grid */}
           <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '16px', fontSize: '0.9rem' }}>
