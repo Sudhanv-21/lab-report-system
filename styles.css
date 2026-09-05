@@ -30,7 +30,6 @@ button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 
 .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
-.app-shell.auth-locked { display: none; }
 .auth-overlay {
   position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 32px;
   background-color: #eaf5f3; background-image:
