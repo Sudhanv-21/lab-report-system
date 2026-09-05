@@ -47,6 +47,16 @@ export function TestCard({ component }) {
           </thead>
           <tbody>
             {component.tests?.map((test) => {
+              if (test.kind === 'heading' || test.isHeading) {
+                const headingStyle = test.style || {};
+                return (
+                  <tr key={test.id}>
+                    <td colSpan="4" style={{ fontSize: `${headingStyle.fontSize || 14}px`, textAlign: headingStyle.alignment || 'left', fontWeight: headingStyle.bold ? '700' : '600', fontStyle: headingStyle.italic ? 'italic' : 'normal', textDecoration: headingStyle.underline ? 'underline' : 'none', color: 'var(--primary-strong)' }}>
+                      {test.name}
+                    </td>
+                  </tr>
+                );
+              }
               const abnormal = isAbnormalResult(test, gender);
               const critical = isCriticalResult(test, gender);
               const genderRange = extractGenderRangeSegment(test.referenceRange, gender);
