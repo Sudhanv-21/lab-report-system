@@ -222,6 +222,7 @@ button { cursor: pointer; }
   display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 20px 24px; border-bottom: 1px solid rgba(14, 58, 103, 0.08); background: #f8fafc;
 }
 .preview-body { padding: 28px; overflow: auto; background: white; }
+.print-empty-header { border-bottom: 2px solid #163256; margin-bottom: 16px; }
 
 @media print {
   body * { visibility: hidden; }
