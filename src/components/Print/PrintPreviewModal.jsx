@@ -40,8 +40,12 @@ export function PrintPreviewModal() {
         </header>
 
         <div className="preview-body" id="printableReport">
-          {/* Keep the configurable blank letterhead space without printing lab branding. */}
-          {settings.letterheadSpacing > 0 && <div style={{ height: `${settings.letterheadSpacing}px` }} />}
+          {/* Keep an empty letterhead area separated from patient metadata. */}
+          <div
+            className="print-empty-header"
+            style={{ height: `${Math.max(settings.letterheadSpacing || 0, 42)}px` }}
+            aria-hidden="true"
+          />
 
           {/* Patient Metadata Grid */}
           <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '16px', fontSize: '0.9rem' }}>
