@@ -151,6 +151,9 @@ button { cursor: pointer; }
 .doctor-directory-panel { margin-top: 12px; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); }
 .doctor-count { display: grid; place-items: center; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: 0.75rem; font-weight: 800; }
 .doctor-directory-hint { margin: 10px 0 0; color: var(--muted); font-size: 0.72rem; line-height: 1.4; }
+.template-style-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px; }
+.template-style-toggles { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; color: var(--muted); font-size: 0.72rem; }
+.template-style-toggles label { display: inline-flex; align-items: center; gap: 3px; }
 .doctor-template-row {
   display: flex; align-items: center; gap: 6px; min-height: 34px; margin-top: 6px; padding: 6px 9px;
   border: 1px solid var(--border); border-radius: 9px; background: #fff; color: var(--text); font-weight: 600;
