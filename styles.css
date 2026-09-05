@@ -41,7 +41,7 @@ button { cursor: pointer; }
 }
 .auth-overlay.hidden { opacity: 0; transform: scale(0.97); visibility: hidden; pointer-events: none; }
 .auth-panel {
-  width: min(440px, 100%); justify-self: start; margin-left: clamp(0px, 7vw, 110px);
+  width: min(440px, 100%); justify-self: center; margin-left: 0;
   background: rgba(255,255,255,0.87); border: 1px solid rgba(255,255,255,0.8);
   border-radius: 22px; padding: 30px 28px 26px; box-shadow: 0 26px 80px rgba(9, 31, 67, 0.18);
   backdrop-filter: blur(10px);
