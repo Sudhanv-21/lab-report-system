@@ -28,6 +28,14 @@ body {
 .hidden-field { display: none !important; }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
+.gender-option {
+  min-width: 42px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px;
+  background: var(--panel); color: var(--muted); font-weight: 700;
+}
+.gender-option.active {
+  border-color: var(--primary); background: var(--primary); color: #fff;
+}
+.gender-option:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
 .auth-overlay {
@@ -123,6 +131,23 @@ button { cursor: pointer; }
 }
 .editor-card { padding: 20px; }
 .card { padding: 16px; }
+.doctor-template-panel {
+  padding: 14px; border: 1px solid var(--border); border-radius: 14px;
+  background: linear-gradient(180deg, var(--surface), #fff); box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+}
+.doctor-template-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.doctor-template-heading h3 { margin: 0; font-size: 0.98rem; color: var(--text); }
+.doctor-template-heading p { margin: 4px 0 0; color: var(--muted); font-size: 0.76rem; line-height: 1.4; }
+.doctor-template-mark {
+  display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px;
+  border: 1px solid #b9d2f5; border-radius: 10px; background: var(--primary-soft); color: var(--primary);
+  font-size: 0.7rem; font-weight: 800; letter-spacing: 0.05em;
+}
+.doctor-template-label { display: block; margin: 12px 0 5px; color: var(--muted); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.doctor-template-input { width: 100%; border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; background: #fff; color: var(--text); }
+.doctor-template-input:focus { border-color: #9ec0ff; box-shadow: 0 0 0 3px rgba(13,94,201,0.10); outline: none; }
+.doctor-template-action { width: 100%; margin-top: 8px; }
+.doctor-template-list { margin-top: 9px; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
 
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 8px; }
 .field-row { display: flex; gap: 12px; }
