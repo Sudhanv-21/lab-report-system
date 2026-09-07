@@ -147,6 +147,8 @@ button { cursor: pointer; }
 .doctor-template-input { width: 100%; border: 1px solid var(--border); border-radius: 9px; padding: 9px 10px; background: #fff; color: var(--text); }
 .doctor-template-input:focus { border-color: #9ec0ff; box-shadow: 0 0 0 3px rgba(13,94,201,0.10); outline: none; }
 .doctor-template-action { width: 100%; margin-top: 8px; }
+.doctor-directory-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.doctor-directory-actions .doctor-template-action { flex: 1 1 100px; }
 .doctor-template-list { margin-top: 9px; color: var(--muted); font-size: 0.76rem; line-height: 1.45; }
 .doctor-directory-panel { margin-top: 12px; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); }
 .doctor-count { display: grid; place-items: center; min-width: 28px; height: 28px; padding: 0 7px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-size: 0.75rem; font-weight: 800; }

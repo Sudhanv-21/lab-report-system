@@ -107,12 +107,20 @@ export function evaluateFormula(formula, component) {
 
 export function recalculateComponentFormulas(component) {
   if (!component || !Array.isArray(component.tests)) return component;
-  const updatedTests = component.tests.map((test) => {
-    if (test.formula) {
-      const computed = evaluateFormula(test.formula, component);
-      return { ...test, value: computed };
-    }
-    return test;
-  });
-  return { ...component, tests: updatedTests };
+  let updatedComponent = { ...component, tests: component.tests.map((test) => ({ ...test })) };
+
+  // Multiple passes allow formulas to depend on other calculated tests regardless of their row order.
+  for (let pass = 0; pass < updatedComponent.tests.length; pass += 1) {
+    let changed = false;
+    const nextTests = updatedComponent.tests.map((test) => {
+      if (!test.formula) return test;
+      const value = evaluateFormula(test.formula, updatedComponent);
+      if (value !== test.value) changed = true;
+      return { ...test, value };
+    });
+    updatedComponent = { ...updatedComponent, tests: nextTests };
+    if (!changed) break;
+  }
+
+  return updatedComponent;
 }

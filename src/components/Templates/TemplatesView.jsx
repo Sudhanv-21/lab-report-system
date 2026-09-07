@@ -9,6 +9,8 @@ export function TemplatesView() {
   const [selectedTemplateId, setSelectedTemplateId] = useState(() => templates[0]?.id || '');
   const [draft, setDraft] = useState(null);
   const [editing, setEditing] = useState(false);
+  const [doctorEditing, setDoctorEditing] = useState(false);
+  const [doctorDraft, setDoctorDraft] = useState([]);
   const [doctorName, setDoctorName] = useState('');
   const [newDoctorName, setNewDoctorName] = useState('');
 
@@ -17,6 +19,8 @@ export function TemplatesView() {
   useEffect(() => {
     setDraft(activeTmpl ? clone(activeTmpl) : null);
     setEditing(false);
+    setDoctorEditing(false);
+    setDoctorDraft(clone(activeTmpl?.doctors || []));
   }, [selectedTemplateId, templates]);
 
   if (!draft) return null;
@@ -37,6 +41,15 @@ export function TemplatesView() {
     setEditing(false);
     setNewDoctorName('');
   };
+  const saveDoctors = () => {
+    const next = { ...clone(activeTmpl), doctors: doctorDraft.filter(Boolean) };
+    saveTemplate(next);
+    setDoctorEditing(false);
+  };
+  const discardDoctors = () => {
+    setDoctorDraft(clone(activeTmpl.doctors || []));
+    setDoctorEditing(false);
+  };
   const createDoctorTemplate = () => {
     const name = doctorName.trim();
     if (!name) return;
@@ -48,20 +61,18 @@ export function TemplatesView() {
   const addDoctorName = () => {
     const name = newDoctorName.trim();
     if (!name) return;
-    const doctors = Array.from(new Set([...(draft.doctors || []), name]));
-    const next = { ...clone(draft), doctors };
-    setDraft(next);
-    setEditing(true);
+    const doctors = Array.from(new Set([...doctorDraft, name]));
+    setDoctorDraft(doctors);
+    setDoctorEditing(true);
     setNewDoctorName('');
   };
   const updateDoctorName = (index, value) => {
-    const doctors = [...(draft.doctors || [])];
+    const doctors = [...doctorDraft];
     doctors[index] = value;
-    updateDraft({ doctors });
+    setDoctorDraft(doctors);
   };
   const removeDoctorName = (index) => {
-    const doctors = (draft.doctors || []).filter((_, doctorIndex) => doctorIndex !== index);
-    updateDraft({ doctors });
+    setDoctorDraft(doctorDraft.filter((_, doctorIndex) => doctorIndex !== index));
   };
   const addSection = () => {
     const section = { id: createId(), name: 'New test group', tests: [] };
@@ -111,25 +122,31 @@ export function TemplatesView() {
                 <h3>Doctors</h3>
                 <p>Names available in the Ref. Doctor search.</p>
               </div>
-              <span className="doctor-count">{(draft.doctors || []).length}</span>
+              <span className="doctor-count">{doctorDraft.length}</span>
             </div>
             <label className="doctor-template-label">Add doctor</label>
             <input className="doctor-template-input" value={newDoctorName} onChange={(event) => setNewDoctorName(event.target.value)} placeholder="Search or add doctor" list="templateDoctorSuggestions" />
             <datalist id="templateDoctorSuggestions">
               {(draft.doctors || []).map((doctor) => <option key={doctor} value={doctor} />)}
             </datalist>
-            <button className="ghost-btn doctor-template-action" type="button" onClick={addDoctorName}>Add doctor</button>
+            <div className="doctor-directory-actions">
+              {!doctorEditing ? <button className="ghost-btn doctor-template-action" type="button" onClick={() => setDoctorEditing(true)}>Edit doctors</button> : <>
+                <button className="ghost-btn doctor-template-action" type="button" onClick={discardDoctors}>Discard</button>
+                <button className="primary-btn doctor-template-action" type="button" onClick={saveDoctors}>Save doctors</button>
+              </>}
+              <button className="ghost-btn doctor-template-action" type="button" onClick={addDoctorName}>Add doctor</button>
+            </div>
             <div className="doctor-template-list">
-              {(draft.doctors || []).length ? draft.doctors.map((doctor, index) => (
+              {doctorDraft.length ? doctorDraft.map((doctor, index) => (
                 <div className="doctor-template-row" key={`${doctor}-${index}`}>
-                  {editing ? (
+                  {doctorEditing ? (
                     <input className="doctor-template-input" value={doctor} onChange={(event) => updateDoctorName(index, event.target.value)} />
                   ) : <span>{doctor}</span>}
-                  {editing && <button className="doctor-template-remove" type="button" onClick={() => removeDoctorName(index)} aria-label={`Remove ${doctor}`} title={`Remove ${doctor}`}>×</button>}
+                  {doctorEditing && <button className="doctor-template-remove" type="button" onClick={() => removeDoctorName(index)} aria-label={`Remove ${doctor}`} title={`Remove ${doctor}`}>×</button>}
                 </div>
               )) : 'No doctors added'}
             </div>
-            {!editing && <p className="doctor-directory-hint">Click Edit to rename or remove doctors.</p>}
+            {!doctorEditing && <p className="doctor-directory-hint">Use Edit doctors to rename or remove doctors.</p>}
           </div>
         </div>
 
@@ -166,6 +183,9 @@ export function TemplatesView() {
                     <option value="normal">Normal heading</option>
                   </select>
                   <input type="number" min="8" max="48" placeholder="Heading size" value={section.headingStyle?.fontSize || 15} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, fontSize: Number(event.target.value) || 15 } })} />
+                  <select value={section.headingStyle?.fontFamily || ''} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, fontFamily: event.target.value } })}>
+                    <option value="">Heading font</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Times New Roman">Times New Roman</option><option value="Verdana">Verdana</option>
+                  </select>
                   <select value={section.headingStyle?.alignment || 'left'} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, alignment: event.target.value } })}>
                     <option value="left">Left</option><option value="center">Center</option><option value="right">Right</option>
                   </select>
@@ -174,6 +194,9 @@ export function TemplatesView() {
                   <label><input type="checkbox" checked={Boolean(section.headingStyle?.underline)} onChange={(event) => updateSection(section.id, { headingStyle: { ...section.headingStyle, underline: event.target.checked } })} /> Underline</label>
                   <input className="template-group-subheading" placeholder="Optional subheading under this group" value={section.subheading || ''} onChange={(event) => updateSection(section.id, { subheading: event.target.value })} />
                   <input type="number" min="8" max="36" placeholder="Subheading size" value={section.subheadingStyle?.fontSize || 12} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, fontSize: Number(event.target.value) || 12 } })} />
+                  <select value={section.subheadingStyle?.fontFamily || ''} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, fontFamily: event.target.value } })}>
+                    <option value="">Subheading font</option><option value="Arial">Arial</option><option value="Georgia">Georgia</option><option value="Times New Roman">Times New Roman</option><option value="Verdana">Verdana</option>
+                  </select>
                   <select value={section.subheadingStyle?.alignment || 'left'} onChange={(event) => updateSection(section.id, { subheadingStyle: { ...section.subheadingStyle, alignment: event.target.value } })}>
                     <option value="left">Subheading left</option><option value="center">Subheading center</option><option value="right">Subheading right</option>
                   </select>
