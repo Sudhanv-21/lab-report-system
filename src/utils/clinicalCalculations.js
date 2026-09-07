@@ -79,25 +79,90 @@ export function isCriticalResult(test, gender) {
   return false;
 }
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export function evaluateFormula(formula, component) {
-  if (!formula || !component) return '';
+  if (!formula || !component || !Array.isArray(component.tests)) return '';
+
+  const rawFormula = String(formula).trim();
+  if (!rawFormula) return '';
 
   let missing = false;
-  const expression = String(formula).replace(/\{([a-zA-Z0-9_-]+)\}/g, (match, id) => {
-    const sibling = component.tests?.find((item) => item.id === id);
-    const numericValue = sibling ? parseNumericValue(sibling.value) : null;
-    if (numericValue === null) {
+  const siblingTests = component.tests;
+
+  // Helper to find a matching sibling test by token / name / id
+  const findSibling = (identifier) => {
+    if (!identifier) return null;
+    const clean = identifier.trim().toLowerCase();
+    return siblingTests.find((item) => {
+      const itemId = (item.id || '').trim().toLowerCase();
+      const itemName = (item.name || '').trim().toLowerCase();
+      return itemId === clean || itemName === clean;
+    });
+  };
+
+  // Step 1: Replace explicit braced or bracketed tokens: {Total Cholesterol}, [Triglycerides], {triglycerides}
+  let expr = rawFormula.replace(/\{([^}]+)\}|\[([^\]]+)\]/g, (match, p1, p2) => {
+    const token = (p1 || p2 || '').trim();
+    const sibling = findSibling(token);
+    if (!sibling) {
       missing = true;
       return '0';
     }
-    return numericValue;
+    const num = parseNumericValue(sibling.value);
+    if (num === null) {
+      missing = true;
+      return '0';
+    }
+    return `(${num})`;
   });
 
+  // Step 2: For any remaining unbraced test names or IDs, match candidates in descending order of length
+  const candidates = [];
+  siblingTests.forEach((item) => {
+    if (item.name && item.name.trim().length >= 2) {
+      candidates.push({ key: item.name.trim(), test: item });
+    }
+    if (item.id && item.id.trim().length >= 2) {
+      candidates.push({ key: item.id.trim(), test: item });
+    }
+  });
+
+  // Deduplicate and sort by length descending so longer test names match first
+  const uniqueCandidates = [];
+  const seenKeys = new Set();
+  candidates.sort((a, b) => b.key.length - a.key.length);
+  for (const c of candidates) {
+    const lower = c.key.toLowerCase();
+    if (!seenKeys.has(lower)) {
+      seenKeys.add(lower);
+      uniqueCandidates.push(c);
+    }
+  }
+
+  for (const { key, test } of uniqueCandidates) {
+    const escapedKey = escapeRegExp(key);
+    const regex = new RegExp(escapedKey, 'gi');
+    if (regex.test(expr)) {
+      const num = parseNumericValue(test.value);
+      if (num === null) {
+        missing = true;
+      }
+      const valStr = num !== null ? `(${num})` : '0';
+      expr = expr.replace(regex, valStr);
+    }
+  }
+
+  // If any referenced variable has no value entered yet, return empty
   if (missing) return '';
-  if (!/^[\d\s+\-*/().]+$/.test(expression)) return '';
+
+  // Step 3: Expression must only contain safe arithmetic characters
+  if (!/^[\d\s+\-*/().]+$/.test(expr)) return '';
 
   try {
-    const result = Function(`"use strict"; return (${expression});`)();
+    const result = Function(`"use strict"; return (${expr});`)();
     if (typeof result !== 'number' || !isFinite(result)) return '';
     return String(Math.round(result * 100) / 100);
   } catch (err) {

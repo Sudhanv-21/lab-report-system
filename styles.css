@@ -207,6 +207,58 @@ button { cursor: pointer; }
   display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
 }
 
+.formula-editor-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 220px;
+}
+.formula-chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+.formula-chip-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin-right: 2px;
+}
+.formula-param-chip {
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid #bfd7ff;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.formula-param-chip:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+.formula-operator-chip {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.formula-operator-chip:hover {
+  background: var(--panel-strong);
+  border-color: #9ec0ff;
+  color: var(--primary);
+}
+
 .toast {
   position: fixed; bottom: 20px; right: 20px; background: rgba(15, 23, 42, 0.96); color: white; padding: 14px 18px; border-radius: 12px;
   opacity: 0; transform: translateY(10px); pointer-events: none; transition: all 0.3s ease; font-weight: 600; z-index: 100;

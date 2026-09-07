@@ -86,6 +86,14 @@ export function TemplatesView() {
     const section = draft.sections.find((item) => item.id === sectionId);
     updateSection(sectionId, { tests: section.tests.filter((test) => test.id !== testId) });
   };
+  const insertIntoFormula = (sectionId, testId, textToInsert) => {
+    const section = draft.sections.find((s) => s.id === sectionId);
+    const currentTest = section?.tests.find((t) => t.id === testId);
+    const currentFormula = currentTest?.formula || '';
+    const separator = currentFormula && !/[+\-*/(\s]$/.test(currentFormula.trim()) ? ' ' : '';
+    const nextFormula = currentFormula ? `${currentFormula}${separator}${textToInsert}` : textToInsert;
+    updateTest(sectionId, testId, { formula: nextFormula });
+  };
 
   return (
     <div className="view-container templates-view">
@@ -215,17 +223,55 @@ export function TemplatesView() {
                           <td>{editing ? <input value={test.unit || ''} onChange={(event) => updateTest(section.id, test.id, { unit: event.target.value })} /> : (test.unit || '—')}</td>
                           <td>{editing ? <textarea rows="2" value={test.referenceRange || ''} onChange={(event) => updateTest(section.id, test.id, { referenceRange: event.target.value })} /> : (test.referenceRange || '—')}</td>
                           <td>
-                            {editing ? <>
-                              <input placeholder="Formula" value={test.formula || ''} onChange={(event) => updateTest(section.id, test.id, { formula: event.target.value })} />
-                              <input placeholder="Critical low" value={test.criticalLow || ''} onChange={(event) => updateTest(section.id, test.id, { criticalLow: event.target.value })} />
-                              <input placeholder="Critical high" value={test.criticalHigh || ''} onChange={(event) => updateTest(section.id, test.id, { criticalHigh: event.target.value })} />
-                              <input placeholder="Options, comma separated" value={(test.options || []).join(', ')} onChange={(event) => updateTest(section.id, test.id, { options: event.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} />
-                            </> : <>
-                              {test.formula && <span className="badge">Formula: {test.formula}</span>}
-                              {test.criticalLow && <span className="badge" style={{ color: 'var(--danger)' }}>Min: {test.criticalLow}</span>}
-                              {test.criticalHigh && <span className="badge" style={{ color: 'var(--danger)' }}>Max: {test.criticalHigh}</span>}
-                              {!test.formula && !test.criticalLow && !test.criticalHigh && '—'}
-                            </>}
+                            {editing ? (
+                              <div className="formula-editor-box">
+                                <input
+                                  placeholder="Formula (e.g. {Triglycerides} / 5 or Triglycerides / 5)"
+                                  value={test.formula || ''}
+                                  onChange={(event) => updateTest(section.id, test.id, { formula: event.target.value })}
+                                  title="Enter calculation formula using test names or click parameter buttons below"
+                                />
+                                <div className="formula-chips-container">
+                                  <span className="formula-chip-label">Insert:</span>
+                                  {section.tests
+                                    .filter((sibling) => sibling.id !== test.id && sibling.name)
+                                    .map((sibling) => (
+                                      <button
+                                        key={sibling.id}
+                                        type="button"
+                                        className="formula-param-chip"
+                                        onClick={() => insertIntoFormula(section.id, test.id, `{${sibling.name}}`)}
+                                        title={`Insert {${sibling.name}} into formula`}
+                                      >
+                                        + {sibling.name}
+                                      </button>
+                                    ))}
+                                  {['+', '-', '*', '/', '(', ')'].map((op) => (
+                                    <button
+                                      key={op}
+                                      type="button"
+                                      className="formula-operator-chip"
+                                      onClick={() => insertIntoFormula(section.id, test.id, op)}
+                                      title={`Insert ${op}`}
+                                    >
+                                      {op}
+                                    </button>
+                                  ))}
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4px', marginTop: '4px' }}>
+                                  <input placeholder="Critical low" value={test.criticalLow || ''} onChange={(event) => updateTest(section.id, test.id, { criticalLow: event.target.value })} />
+                                  <input placeholder="Critical high" value={test.criticalHigh || ''} onChange={(event) => updateTest(section.id, test.id, { criticalHigh: event.target.value })} />
+                                </div>
+                                <input placeholder="Options, comma separated" value={(test.options || []).join(', ')} onChange={(event) => updateTest(section.id, test.id, { options: event.target.value.split(',').map((item) => item.trim()).filter(Boolean) })} style={{ marginTop: '4px' }} />
+                              </div>
+                            ) : (
+                              <>
+                                {test.formula && <span className="badge" style={{ backgroundColor: 'var(--primary-soft)', color: 'var(--primary)' }}>Formula: {test.formula}</span>}
+                                {test.criticalLow && <span className="badge" style={{ color: 'var(--danger)', marginLeft: '4px' }}>Min: {test.criticalLow}</span>}
+                                {test.criticalHigh && <span className="badge" style={{ color: 'var(--danger)', marginLeft: '4px' }}>Max: {test.criticalHigh}</span>}
+                                {!test.formula && !test.criticalLow && !test.criticalHigh && '—'}
+                              </>
+                            )}
                           </td>
                           {editing && <td><button className="doctor-template-remove" type="button" onClick={() => removeTest(section.id, test.id)} aria-label={`Remove ${test.name || 'parameter'}`} title="Remove parameter">×</button></td>}
                         </tr>
