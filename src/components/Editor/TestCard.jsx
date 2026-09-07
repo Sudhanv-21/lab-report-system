@@ -16,7 +16,7 @@ export function TestCard({ component }) {
     <div className="card test-group-card" style={{ marginBottom: '20px' }}>
       <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-              <h3 style={{ margin: 0, fontSize: `${component.headingStyle?.fontSize || 18}px`, textAlign: component.headingStyle?.alignment || 'left', fontWeight: component.headingStyle?.bold ? '700' : '600', fontStyle: component.headingStyle?.italic ? 'italic' : 'normal', textDecoration: component.headingStyle?.underline ? 'underline' : 'none' }}>{component.name}</h3>
+              <h3 style={{ margin: 0, fontFamily: component.headingStyle?.fontFamily || 'inherit', fontSize: `${component.headingStyle?.fontSize || 18}px`, textAlign: component.headingStyle?.alignment || 'left', fontWeight: component.headingStyle?.bold ? '700' : '600', fontStyle: component.headingStyle?.italic ? 'italic' : 'normal', textDecoration: component.headingStyle?.underline ? 'underline' : 'none' }}>{component.name}</h3>
           <span style={{ fontSize: '0.8rem', color: 'var(--muted)' }}>
             {component.tests?.length || 0} active parameters
           </span>

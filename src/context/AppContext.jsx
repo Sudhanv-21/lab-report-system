@@ -23,7 +23,7 @@ export function makeEmptySheet(template = DEFAULT_TEMPLATES[0]) {
       reportDate: getIndiaDateValue(),
       notes: ''
     },
-    tests: clonedSections,
+    tests: clonedSections.map((section) => recalculateComponentFormulas(section)),
     billing: {
       totalAmount: 500,
       discount: 0,
@@ -31,6 +31,13 @@ export function makeEmptySheet(template = DEFAULT_TEMPLATES[0]) {
       paymentMethod: 'Cash',
       status: 'Paid'
     }
+  };
+}
+
+function recalculateSheetFormulas(sheet) {
+  return {
+    ...sheet,
+    tests: Array.isArray(sheet.tests) ? sheet.tests.map((component) => recalculateComponentFormulas(component)) : []
   };
 }
 
@@ -78,7 +85,7 @@ export function AppProvider({ children }) {
         const parsed = JSON.parse(localData);
         if (Array.isArray(parsed.templates) && parsed.templates.length) setTemplates(parsed.templates);
         if (Array.isArray(parsed.sheets) && parsed.sheets.length) {
-          setSheets(parsed.sheets);
+          setSheets(parsed.sheets.map(recalculateSheetFormulas));
           setActiveSheetId(parsed.activeSheetId || parsed.sheets[0].id);
         }
         if (Array.isArray(parsed.history)) setHistory(parsed.history);
@@ -102,7 +109,7 @@ export function AppProvider({ children }) {
             const cloudState = data.payload;
             if (Array.isArray(cloudState.templates) && cloudState.templates.length) setTemplates(cloudState.templates);
             if (Array.isArray(cloudState.sheets) && cloudState.sheets.length) {
-              setSheets(cloudState.sheets);
+              setSheets(cloudState.sheets.map(recalculateSheetFormulas));
               setActiveSheetId(cloudState.activeSheetId || cloudState.sheets[0].id);
             }
             if (Array.isArray(cloudState.history)) setHistory(cloudState.history);
@@ -222,7 +229,7 @@ export function AppProvider({ children }) {
         if (exists) {
           nextTests = sheet.tests.filter((comp) => comp.id !== section.id);
         } else {
-          nextTests = [...sheet.tests, JSON.parse(JSON.stringify(section))];
+          nextTests = [...sheet.tests, recalculateComponentFormulas(JSON.parse(JSON.stringify(section)))];
         }
         return {
           ...sheet,

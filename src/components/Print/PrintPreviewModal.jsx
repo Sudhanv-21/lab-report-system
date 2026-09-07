@@ -99,12 +99,12 @@ export function PrintPreviewModal() {
                 {tests?.map((group) => (
                   <React.Fragment key={group.id}>
                     <tr className="print-main-heading-row">
-                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '10px 6px 4px', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
+                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '10px 6px 4px', fontFamily: group.headingStyle?.fontFamily || 'inherit', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
                         {group.name}
                       </td>
                     </tr>
                     {group.subheading && <tr className="print-subheading-row">
-                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '0 6px 7px', color: '#5d7287', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
+                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '0 6px 7px', color: '#5d7287', fontFamily: group.subheadingStyle?.fontFamily || 'inherit', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
                         {group.subheading}
                       </td>
                     </tr>}
