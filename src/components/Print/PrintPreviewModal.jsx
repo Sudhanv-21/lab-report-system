@@ -10,6 +10,7 @@ import { formatSavedAt } from '../../utils/formatters.js';
 export function PrintPreviewModal() {
   const { previewReport, setPreviewReport, settings } = useApp();
   const [includeUnitsAsSeparateField, setIncludeUnitsAsSeparateField] = useState(false);
+  const [showGenderSpecificRange, setShowGenderSpecificRange] = useState(false);
 
   if (!previewReport) return null;
 
@@ -18,6 +19,13 @@ export function PrintPreviewModal() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const formatReferenceRange = (range) => {
+    if (!range) return '—';
+    const text = String(range).replace(/\s*\|\s*/g, '\n');
+    if (!showGenderSpecificRange) return text;
+    return extractGenderRangeSegment(text, gender).replace(/\s*\|\s*/g, '\n');
   };
 
   return (
@@ -38,6 +46,14 @@ export function PrintPreviewModal() {
                 onChange={(event) => setIncludeUnitsAsSeparateField(event.target.checked)}
               />
               Include units as separate field
+            </label>
+            <label className="print-unit-toggle">
+              <input
+                type="checkbox"
+                checked={showGenderSpecificRange}
+                onChange={(event) => setShowGenderSpecificRange(event.target.checked)}
+              />
+              Show only patient gender reference range
             </label>
             <button className="ghost-btn" onClick={() => setPreviewReport(null)}>
               Close
@@ -95,7 +111,6 @@ export function PrintPreviewModal() {
                     {group.tests?.map((t) => {
                       const abnormal = isAbnormalResult(t, gender);
                       const critical = isCriticalResult(t, gender);
-                      const genderRange = extractGenderRangeSegment(t.referenceRange, gender);
 
                       const style = t.style || {};
                       const textStyle = {
@@ -111,7 +126,7 @@ export function PrintPreviewModal() {
                           <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle }}>{t.name}</td>
                           <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'}{!includeUnitsAsSeparateField && t.unit ? ` ${t.unit}` : ''} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
                           {includeUnitsAsSeparateField && <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>}
-                          <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{genderRange || t.referenceRange || '—'}</td>
+                          <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{formatReferenceRange(t.referenceRange)}</td>
                         </tr>
                       );
                     })}
