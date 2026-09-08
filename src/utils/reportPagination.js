@@ -8,18 +8,18 @@
 
 export function getPageCapacities(format = 'a4', letterheadSpacing = 0, footerSpacing = 0) {
   const base = {
-    a4: { intermediate: 18, last: 14 },
-    letter: { intermediate: 16, last: 13 },
-    legal: { intermediate: 25, last: 21 },
-    a5: { intermediate: 10, last: 7 }
-  }[format] || { intermediate: 18, last: 14 };
+    a4: { intermediate: 14, last: 10 },
+    letter: { intermediate: 13, last: 9 },
+    legal: { intermediate: 19, last: 15 },
+    a5: { intermediate: 8, last: 5 }
+  }[format] || { intermediate: 14, last: 10 };
 
-  const extraLetterheadUnits = Math.max(0, Math.round((letterheadSpacing - 42) / 30));
-  const extraFooterUnits = Math.max(0, Math.round(footerSpacing / 30));
+  const extraLetterheadUnits = Math.max(0, Math.round((letterheadSpacing - 42) / 35));
+  const extraFooterUnits = Math.max(0, Math.round(footerSpacing / 35));
 
   return {
-    intermediateCapacity: Math.max(6, base.intermediate - extraLetterheadUnits),
-    lastPageCapacity: Math.max(4, base.last - extraLetterheadUnits - extraFooterUnits)
+    intermediateCapacity: Math.max(5, base.intermediate - extraLetterheadUnits),
+    lastPageCapacity: Math.max(3, base.last - extraLetterheadUnits - extraFooterUnits)
   };
 }
 
@@ -46,12 +46,17 @@ export function paginateTestGroups(
 
   const getItemWeight = (test) => {
     if (!test) return 1.0;
-    const ref = test.referenceRange ? String(test.referenceRange).split(/\r?\n|\|/).length : 1;
-    return ref > 2 ? 1.3 : 1.0;
+    if (!test.referenceRange) return 1.0;
+    const lines = String(test.referenceRange).split(/\r?\n|\|/).filter((s) => s.trim().length > 0).length;
+    if (lines <= 1) return 1.0;
+    if (lines === 2) return 1.4;
+    if (lines === 3) return 1.8;
+    if (lines === 4) return 2.2;
+    return Math.min(3.2, 1.0 + (lines - 1) * 0.45);
   };
 
-  const HEADER_WEIGHT = 1.2;
-  const SUBHEADER_WEIGHT = 0.8;
+  const HEADER_WEIGHT = 1.1;
+  const SUBHEADER_WEIGHT = 0.75;
 
   // Check if everything fits on a single page
   let totalSinglePageWeight = 0;

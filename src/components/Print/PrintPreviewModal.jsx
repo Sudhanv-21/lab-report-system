@@ -19,6 +19,7 @@ export function PrintPreviewModal() {
   const { previewReport, setPreviewReport, settings } = useApp();
   const [pageFormat, setPageFormat] = useState(() => settings.pageFormat || 'a4');
   const [density, setDensity] = useState('auto');
+  const [showPageNumbers, setShowPageNumbers] = useState(false);
   const [includeUnitsAsSeparateField, setIncludeUnitsAsSeparateField] = useState(false);
   const [showGenderSpecificRange, setShowGenderSpecificRange] = useState(false);
 
@@ -52,7 +53,7 @@ export function PrintPreviewModal() {
         {`
           @page {
             size: ${currentFormat.cssSize};
-            margin: ${currentFormat.margin};
+            margin: 0 !important;
           }
         `}
       </style>
@@ -133,6 +134,14 @@ export function PrintPreviewModal() {
               />
               Gender range only
             </label>
+            <label className="print-unit-toggle">
+              <input
+                type="checkbox"
+                checked={showPageNumbers}
+                onChange={(event) => setShowPageNumbers(event.target.checked)}
+              />
+              Page numbers
+            </label>
             <button className="ghost-btn" onClick={() => setPreviewReport(null)}>
               Close
             </button>
@@ -164,8 +173,8 @@ export function PrintPreviewModal() {
                     />
 
                     {/* Patient Metadata Grid (repeats identically on every page) */}
-                    <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '16px', fontSize: '0.9rem' }}>
-                      <div className="print-patient-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(220px, 0.75fr)', gap: '8px 24px', border: '1px solid #d7e3ee', padding: '12px', borderRadius: '6px' }}>
+                    <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '14px', fontSize: '0.9rem' }}>
+                      <div className="print-patient-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(220px, 0.75fr)', gap: '8px 24px', border: '1px solid #d7e3ee', padding: '10px 12px', borderRadius: '6px' }}>
                         <div className="print-meta-left"><strong>Patient Name:</strong> {patient?.name || '—'}</div>
                         <div className="print-meta-right"><strong>Sample Date:</strong> {patient?.sampleCollectedAt ? patient.sampleCollectedAt.replace('T', ' ') : '—'}</div>
                         <div className="print-meta-left"><strong>Age / Gender:</strong> {patient?.age || '—'} / {gender === 'F' ? 'Female' : gender === 'O' ? 'Other' : 'Male'}</div>
@@ -180,23 +189,23 @@ export function PrintPreviewModal() {
                       <table className="print-results-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '0.88rem' }}>
                         <thead>
                           <tr className="print-table-header-row" style={{ textAlign: 'left', color: '#5d7287', borderBottom: '1px solid #d7e3ee' }}>
-                            <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '38%' : '42%', fontWeight: '700' }}>Test / Parameter</th>
-                            <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '22%' : '28%', fontWeight: '700' }}>Result Value</th>
-                            {includeUnitsAsSeparateField && <th style={{ padding: '6px', width: '15%', fontWeight: '700' }}>Unit</th>}
-                            <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '25%' : '30%', fontWeight: '700' }}>Biological Ref. Range</th>
+                            <th style={{ padding: '5px 6px', width: includeUnitsAsSeparateField ? '38%' : '42%', fontWeight: '700' }}>Test / Parameter</th>
+                            <th style={{ padding: '5px 6px', width: includeUnitsAsSeparateField ? '22%' : '28%', fontWeight: '700' }}>Result Value</th>
+                            {includeUnitsAsSeparateField && <th style={{ padding: '5px 6px', width: '15%', fontWeight: '700' }}>Unit</th>}
+                            <th style={{ padding: '5px 6px', width: includeUnitsAsSeparateField ? '25%' : '30%', fontWeight: '700' }}>Biological Ref. Range</th>
                           </tr>
                         </thead>
                         <tbody>
                           {pageData.groups?.map((group, gIdx) => (
                             <React.Fragment key={`${group.id}-${gIdx}`}>
                               <tr className="print-main-heading-row">
-                                <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '10px 6px 4px', fontFamily: group.headingStyle?.fontFamily || 'inherit', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
+                                <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '8px 6px 3px', fontFamily: group.headingStyle?.fontFamily || 'inherit', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
                                   {group.name}
                                 </td>
                               </tr>
                               {group.subheading && (
                                 <tr className="print-subheading-row">
-                                  <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '0 6px 7px', color: '#5d7287', fontFamily: group.subheadingStyle?.fontFamily || 'inherit', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
+                                  <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '0 6px 5px', color: '#5d7287', fontFamily: group.subheadingStyle?.fontFamily || 'inherit', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
                                     {group.subheading}
                                   </td>
                                 </tr>
@@ -225,12 +234,12 @@ export function PrintPreviewModal() {
 
                                 return (
                                   <tr key={t.id}>
-                                    <td style={{ padding: '6px', verticalAlign: 'top', ...nameStyle }}>{t.name}</td>
-                                    <td style={{ padding: '6px', verticalAlign: 'top', ...valueStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>
+                                    <td style={{ padding: '5px 6px', verticalAlign: 'top', ...nameStyle }}>{t.name}</td>
+                                    <td style={{ padding: '5px 6px', verticalAlign: 'top', ...valueStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>
                                       {t.value || '—'}{!includeUnitsAsSeparateField && t.unit ? ` ${t.unit}` : ''} {critical ? ' (Critical)' : abnormal ? ' *' : ''}
                                     </td>
-                                    {includeUnitsAsSeparateField && <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>}
-                                    <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{formatReferenceRange(t.referenceRange)}</td>
+                                    {includeUnitsAsSeparateField && <td style={{ padding: '5px 6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>}
+                                    <td style={{ padding: '5px 6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{formatReferenceRange(t.referenceRange)}</td>
                                   </tr>
                                 );
                               })}
@@ -242,32 +251,34 @@ export function PrintPreviewModal() {
 
                     {/* Page Footer */}
                     {!isLastPage ? (
-                      <div className="print-intermediate-footer" style={{ marginTop: 'auto', paddingTop: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: '#8c9ba5', borderTop: '1px dashed #e2e8f0' }}>
+                      <div className="print-intermediate-footer" style={{ marginTop: 'auto', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.78rem', color: '#8c9ba5', borderTop: '1px dashed #e2e8f0' }}>
                         <div>Arun Clinical Lab • (Continued on next page...)</div>
-                        <div>Page {pageData.pageNumber} of {pageData.totalPages}</div>
+                        {showPageNumbers && <div>Page {pageData.pageNumber} of {pageData.totalPages}</div>}
                       </div>
                     ) : (
-                      <div className="print-final-footer-container" style={{ marginTop: 'auto', paddingTop: '16px' }}>
-                        <div className="print-end-report" style={{ textAlign: 'center', margin: '14px 0 10px', fontSize: '0.8rem', color: '#8c9ba5' }}>
+                      <div className="print-final-footer-container" style={{ marginTop: 'auto', paddingTop: '12px' }}>
+                        <div className="print-end-report" style={{ textAlign: 'center', margin: '10px 0 8px', fontSize: '0.78rem', color: '#8c9ba5' }}>
                           *** END OF REPORT ***
                         </div>
 
-                        <footer className="print-footer-container print-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '10px', paddingTop: '10px' }}>
-                          <div style={{ fontSize: '0.8rem', color: '#5d7287' }}>
+                        <footer className="print-footer-container print-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '6px', paddingTop: '6px' }}>
+                          <div style={{ fontSize: '0.78rem', color: '#5d7287' }}>
                             <div>Printed: {new Date().toLocaleString()}</div>
                             <div>Report generated by Arun Clinical Lab</div>
                           </div>
 
                           <div style={{ textAlign: 'center' }}>
-                            <div style={{ borderTop: '1px solid #000', width: '180px', minHeight: '34px', paddingTop: '4px', fontWeight: '600', fontSize: '0.85rem' }}>
+                            <div style={{ borderTop: '1px solid #000', width: '180px', minHeight: '32px', paddingTop: '4px', fontWeight: '600', fontSize: '0.85rem' }}>
                               Signature
                             </div>
                           </div>
                         </footer>
 
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8px', fontSize: '0.78rem', color: '#8c9ba5' }}>
-                          Page {pageData.pageNumber} of {pageData.totalPages}
-                        </div>
+                        {showPageNumbers && (
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px', fontSize: '0.75rem', color: '#8c9ba5' }}>
+                            Page {pageData.pageNumber} of {pageData.totalPages}
+                          </div>
+                        )}
 
                         {settings.footerSpacing > 0 && (
                           <div style={{ height: `${settings.footerSpacing}px` }} />
