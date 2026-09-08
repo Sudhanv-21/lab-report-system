@@ -363,22 +363,69 @@ button { cursor: pointer; }
     background: #fff !important;
     width: 100% !important;
     height: auto !important;
+    overflow: visible !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  body * { visibility: hidden; }
-  #printableReport, #printableReport * { visibility: visible; }
-  #printableReport {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    display: block !important;
-    gap: 0 !important;
+  .no-print,
+  .topbar,
+  .tabbar-row,
+  .content-grid,
+  .sidebar,
+  .editor-card,
+  .preview-header,
+  .preview-page-badge,
+  .auth-overlay,
+  .toast {
+    display: none !important;
   }
+
+  .preview-overlay {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+  }
+
+  .preview-panel {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-height: none !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .preview-body {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .preview-pages-container {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
   .preview-page-wrapper {
     page-break-before: auto !important;
     page-break-after: always !important;
@@ -393,12 +440,14 @@ button { cursor: pointer; }
     display: block !important;
     box-sizing: border-box !important;
   }
+
   .preview-page-wrapper:last-child {
     page-break-after: auto !important;
     break-after: auto !important;
   }
+
   .preview-page-sheet {
-    position: relative !important;
+    position: static !important;
     width: 100% !important;
     max-width: none !important;
     min-height: 0 !important;
@@ -413,20 +462,31 @@ button { cursor: pointer; }
     display: block !important;
     box-sizing: border-box !important;
   }
+
   .preview-page-sheet.sheet-a5 {
     padding: 8mm 10mm !important;
   }
-  .no-print, .preview-header, .topbar, .tabbar-row, .preview-page-badge { display: none !important; }
+
+  .print-results-table {
+    width: 100% !important;
+    page-break-inside: auto !important;
+  }
 
   tr {
-    break-inside: avoid !important;
     page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 
   .print-main-heading-row,
   .print-subheading-row {
-    break-after: avoid !important;
     page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .print-intermediate-footer,
+  .print-final-footer-container {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
   }
 }
 
