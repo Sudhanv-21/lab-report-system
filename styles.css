@@ -279,13 +279,37 @@ button { cursor: pointer; }
 .preview-format-group { display: flex; align-items: center; gap: 6px; }
 .print-unit-toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
 .preview-body {
-  padding: 24px;
+  padding: 24px 16px;
   overflow-y: auto;
   background: #eaedf2;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   min-height: 480px;
+}
+.preview-pages-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  width: 100%;
+}
+.preview-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.preview-page-badge {
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.4px;
 }
 .preview-page-sheet {
   background: white;
@@ -294,7 +318,9 @@ button { cursor: pointer; }
   padding: 36px 42px;
   width: 100%;
   box-sizing: border-box;
-  transition: max-width 0.2s ease, min-height 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   margin: 0 auto;
 }
 .preview-page-sheet.sheet-a4 {
@@ -323,15 +349,6 @@ button { cursor: pointer; }
   font-size: 0.82rem !important;
 }
 
-.print-thead-header-cell,
-.print-thead-meta-cell {
-  padding: 0 !important;
-  border: none !important;
-  font-weight: normal !important;
-  text-align: left !important;
-  background: transparent !important;
-}
-
 .print-empty-header { border-bottom: 2px solid #163256; margin-bottom: 16px; }
 .print-patient-meta-grid > div { min-width: 0; overflow-wrap: anywhere; }
 .print-meta-right { text-align: left; }
@@ -347,19 +364,43 @@ button { cursor: pointer; }
     left: 0;
     top: 0;
     width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    gap: 0 !important;
+  }
+  .preview-page-wrapper {
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    display: block !important;
+  }
+  .preview-page-wrapper:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  .preview-page-sheet {
+    position: relative !important;
+    width: 100% !important;
     max-width: none !important;
-    min-height: auto !important;
+    min-height: 98vh !important;
+    height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
     background: white !important;
     box-shadow: none !important;
     border-radius: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
   }
-  .no-print, .preview-header, .topbar, .tabbar-row { display: none !important; }
-
-  thead {
-    display: table-header-group !important;
-  }
+  .no-print, .preview-header, .topbar, .tabbar-row, .preview-page-badge { display: none !important; }
 
   tr {
     break-inside: avoid !important;
@@ -370,12 +411,6 @@ button { cursor: pointer; }
   .print-subheading-row {
     break-after: avoid !important;
     page-break-after: avoid !important;
-  }
-
-  .print-end-report,
-  .print-footer-container {
-    break-inside: avoid !important;
-    page-break-inside: avoid !important;
   }
 }
 
