@@ -250,7 +250,7 @@ export function PrintPreviewModal() {
                     </div>
 
                     {/* Uniform Page Footer on every page */}
-                    <div className="print-final-footer-container" style={{ marginTop: '20px', paddingTop: '10px' }}>
+                    <div className="print-final-footer-container" style={{ marginTop: 'auto', paddingTop: '8px' }}>
                       <div className="print-end-report" style={{ textAlign: 'center', margin: '8px 0 6px', fontSize: '0.78rem', color: '#8c9ba5' }}>
                         *** END OF REPORT ***
                       </div>
