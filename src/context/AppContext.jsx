@@ -57,7 +57,8 @@ export function AppProvider({ children }) {
     letterheadSpacing: 0,
     footerSpacing: 0,
     metaBoxed: false,
-    signatureImage: ''
+    signatureImage: '',
+    pageFormat: 'a4'
   });
   const [previewReport, setPreviewReport] = useState(null);
   const [toast, setToast] = useState(null);

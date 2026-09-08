@@ -7,13 +7,22 @@ import {
 } from '../../utils/clinicalCalculations.js';
 import { formatSavedAt } from '../../utils/formatters.js';
 
+const PAGE_FORMAT_OPTIONS = [
+  { id: 'a4', label: 'A4', sizeDetail: '210 × 297 mm', cssSize: 'A4 portrait', margin: '10mm' },
+  { id: 'letter', label: 'Letter', sizeDetail: '8.5 × 11 in', cssSize: 'letter portrait', margin: '10mm' },
+  { id: 'legal', label: 'Legal', sizeDetail: '8.5 × 14 in', cssSize: 'legal portrait', margin: '10mm' },
+  { id: 'a5', label: 'A5', sizeDetail: '148 × 210 mm', cssSize: 'A5 portrait', margin: '8mm' }
+];
+
 export function PrintPreviewModal() {
   const { previewReport, setPreviewReport, settings } = useApp();
+  const [pageFormat, setPageFormat] = useState(() => settings.pageFormat || 'a4');
   const [includeUnitsAsSeparateField, setIncludeUnitsAsSeparateField] = useState(false);
   const [showGenderSpecificRange, setShowGenderSpecificRange] = useState(false);
 
   if (!previewReport) return null;
 
+  const currentFormat = PAGE_FORMAT_OPTIONS.find((f) => f.id === pageFormat) || PAGE_FORMAT_OPTIONS[0];
   const { patient, tests, savedAt } = previewReport;
   const gender = patient?.gender || 'M';
 
@@ -30,6 +39,14 @@ export function PrintPreviewModal() {
 
   return (
     <div className="preview-overlay">
+      <style>
+        {`
+          @page {
+            size: ${currentFormat.cssSize};
+            margin: ${currentFormat.margin};
+          }
+        `}
+      </style>
       <div className="preview-panel">
         <header className="preview-header no-print">
           <div>
@@ -38,7 +55,34 @@ export function PrintPreviewModal() {
               Review report layout before printing or saving to PDF.
             </p>
           </div>
-          <div className="preview-actions" style={{ display: 'flex', gap: '8px' }}>
+          <div className="preview-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="preview-format-group" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <label htmlFor="pageFormatSelect" style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--muted)' }}>
+                Page Format:
+              </label>
+              <select
+                id="pageFormatSelect"
+                value={pageFormat}
+                onChange={(event) => setPageFormat(event.target.value)}
+                style={{
+                  fontSize: '0.82rem',
+                  padding: '5px 8px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)',
+                  backgroundColor: 'white',
+                  fontWeight: 600,
+                  color: 'var(--text)',
+                  cursor: 'pointer'
+                }}
+              >
+                {PAGE_FORMAT_OPTIONS.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.label} ({opt.sizeDetail})
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <label className="print-unit-toggle">
               <input
                 type="checkbox"
@@ -64,13 +108,14 @@ export function PrintPreviewModal() {
           </div>
         </header>
 
-        <div className="preview-body" id="printableReport">
-          {/* Keep an empty letterhead area separated from patient metadata. */}
-          <div
-            className="print-empty-header"
-            style={{ height: `${Math.max(settings.letterheadSpacing || 0, 42)}px` }}
-            aria-hidden="true"
-          />
+        <div className="preview-body">
+          <div className={`preview-page-sheet sheet-${pageFormat}`} id="printableReport">
+            {/* Keep an empty letterhead area separated from patient metadata. */}
+            <div
+              className="print-empty-header"
+              style={{ height: `${Math.max(settings.letterheadSpacing || 0, 42)}px` }}
+              aria-hidden="true"
+            />
 
           {/* Patient Metadata Grid */}
           <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '16px', fontSize: '0.9rem' }}>
@@ -160,5 +205,6 @@ export function PrintPreviewModal() {
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 }

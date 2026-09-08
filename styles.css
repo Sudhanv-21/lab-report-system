@@ -275,8 +275,54 @@ button { cursor: pointer; }
 .preview-header {
   display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 20px 24px; border-bottom: 1px solid rgba(14, 58, 103, 0.08); background: #f8fafc;
 }
-.print-unit-toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.8rem; white-space: nowrap; }
-.preview-body { padding: 28px; overflow: auto; background: white; }
+.preview-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.preview-format-group { display: flex; align-items: center; gap: 6px; }
+.print-unit-toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.8rem; white-space: nowrap; cursor: pointer; }
+.preview-body {
+  padding: 24px;
+  overflow-y: auto;
+  background: #eaedf2;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 480px;
+}
+.preview-page-sheet {
+  background: white;
+  box-shadow: 0 6px 30px rgba(15, 23, 42, 0.14), 0 1px 3px rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
+  padding: 36px 42px;
+  width: 100%;
+  box-sizing: border-box;
+  transition: max-width 0.2s ease, min-height 0.2s ease;
+  margin: 0 auto;
+}
+.preview-page-sheet.sheet-a4 {
+  max-width: 794px;
+  min-height: 1050px;
+}
+.preview-page-sheet.sheet-letter {
+  max-width: 816px;
+  min-height: 1000px;
+}
+.preview-page-sheet.sheet-legal {
+  max-width: 816px;
+  min-height: 1280px;
+}
+.preview-page-sheet.sheet-a5 {
+  max-width: 560px;
+  min-height: 760px;
+  padding: 24px 28px;
+  font-size: 0.82rem;
+}
+.preview-page-sheet.sheet-a5 .print-patient-meta-grid {
+  gap: 6px 14px !important;
+  padding: 8px !important;
+}
+.preview-page-sheet.sheet-a5 .print-results-table {
+  font-size: 0.82rem !important;
+}
+
 .print-empty-header { border-bottom: 2px solid #163256; margin-bottom: 16px; }
 .print-patient-meta-grid > div { min-width: 0; overflow-wrap: anywhere; }
 .print-meta-right { text-align: left; }
@@ -288,7 +334,17 @@ button { cursor: pointer; }
   body * { visibility: hidden; }
   #printableReport, #printableReport * { visibility: visible; }
   #printableReport {
-    position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 10mm; background: white;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
   }
   .no-print, .preview-header, .topbar, .tabbar-row { display: none !important; }
 }
