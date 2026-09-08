@@ -58,7 +58,7 @@ export function TestCard({ component }) {
                 >
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontWeight: abnormal || critical ? '700' : '500' }}>
+                      <span style={{ fontWeight: '500' }}>
                         {test.name}
                       </span>
                       {test.formula && (

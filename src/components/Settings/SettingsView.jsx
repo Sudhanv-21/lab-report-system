@@ -117,6 +117,20 @@ export function SettingsView() {
             </div>
 
             <div className="field-group">
+              <label>Default Page Format</label>
+              <select
+                value={settings.pageFormat || 'a4'}
+                onChange={(e) => setSettings((prev) => ({ ...prev, pageFormat: e.target.value }))}
+              >
+                <option value="a4">A4 (210 × 297 mm) — Standard Lab</option>
+                <option value="letter">Letter (8.5 × 11 in)</option>
+                <option value="legal">Legal (8.5 × 14 in)</option>
+                <option value="a5">A5 (148 × 210 mm) — Half Page</option>
+              </select>
+              <small className="muted-text">Default paper format when opening print preview.</small>
+            </div>
+
+            <div className="field-group">
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                 <input
                   type="checkbox"

@@ -57,7 +57,8 @@ export function AppProvider({ children }) {
     letterheadSpacing: 0,
     footerSpacing: 0,
     metaBoxed: false,
-    signatureImage: ''
+    signatureImage: '',
+    pageFormat: 'a4'
   });
   const [previewReport, setPreviewReport] = useState(null);
   const [toast, setToast] = useState(null);
@@ -73,6 +74,28 @@ export function AppProvider({ children }) {
 
   // Active template
   const activeTemplate = templates.find((t) => t.id === activeSheet?.templateId) || templates[0];
+
+  // Template Management & Editing State (persists across tab switches until Save/Discard)
+  const [selectedTemplateId, setSelectedTemplateId] = useState(() => DEFAULT_TEMPLATES[0]?.id || '');
+  const [templateDraft, setTemplateDraft] = useState(() => JSON.parse(JSON.stringify(DEFAULT_TEMPLATES[0])));
+  const [templateEditing, setTemplateEditing] = useState(false);
+  const [templateDoctorDraft, setTemplateDoctorDraft] = useState(() => JSON.parse(JSON.stringify(DEFAULT_TEMPLATES[0]?.doctors || [])));
+  const [templateDoctorEditing, setTemplateDoctorEditing] = useState(false);
+
+  const selectedTemplate = templates.find((t) => t.id === selectedTemplateId) || templates[0] || DEFAULT_TEMPLATES[0];
+
+  // Keep draft in sync with selected template ONLY when NOT actively editing
+  useEffect(() => {
+    if (!templateEditing && selectedTemplate) {
+      setTemplateDraft(JSON.parse(JSON.stringify(selectedTemplate)));
+    }
+  }, [selectedTemplateId, templates, templateEditing]);
+
+  useEffect(() => {
+    if (!templateDoctorEditing && selectedTemplate) {
+      setTemplateDoctorDraft(JSON.parse(JSON.stringify(selectedTemplate.doctors || [])));
+    }
+  }, [selectedTemplateId, templates, templateDoctorEditing]);
 
   // Load state on user change
   useEffect(() => {
@@ -364,7 +387,7 @@ export function AppProvider({ children }) {
     );
   };
 
-  // Template CRUD
+  // Template CRUD & Persistent Draft Management
   const saveTemplate = (templateData) => {
     setTemplates((prev) => {
       const index = prev.findIndex((t) => t.id === templateData.id);
@@ -375,6 +398,8 @@ export function AppProvider({ children }) {
       }
       return [...prev, templateData];
     });
+    setTemplateDraft(JSON.parse(JSON.stringify(templateData)));
+    setTemplateEditing(false);
     showToast(`Template "${templateData.name}" saved`);
   };
 
@@ -383,8 +408,151 @@ export function AppProvider({ children }) {
       showToast('Cannot delete the only remaining template');
       return;
     }
-    setTemplates((prev) => prev.filter((t) => t.id !== templateId));
+    const remaining = templates.filter((t) => t.id !== templateId);
+    setTemplates(remaining);
+    setSelectedTemplateId(remaining[0]?.id || '');
+    setTemplateDraft(JSON.parse(JSON.stringify(remaining[0])));
+    setTemplateEditing(false);
     showToast('Template deleted');
+  };
+
+  const selectTemplate = (templateId) => {
+    if (templateEditing && templateId !== selectedTemplateId) {
+      if (!window.confirm('You have unsaved changes in this template. Discard changes and switch?')) {
+        return;
+      }
+      discardTemplateDraft();
+    }
+    setSelectedTemplateId(templateId);
+  };
+
+  const updateTemplateDraft = (changes) => {
+    setTemplateDraft((prev) => ({ ...prev, ...changes }));
+  };
+
+  const updateTemplateSection = (sectionId, changes) => {
+    setTemplateDraft((prev) => ({
+      ...prev,
+      sections: prev.sections.map((sec) => (sec.id === sectionId ? { ...sec, ...changes } : sec))
+    }));
+  };
+
+  const updateTemplateTest = (sectionId, testId, changes) => {
+    setTemplateDraft((prev) => ({
+      ...prev,
+      sections: prev.sections.map((sec) => {
+        if (sec.id !== sectionId) return sec;
+        return {
+          ...sec,
+          tests: sec.tests.map((t) => (t.id === testId ? { ...t, ...changes } : t))
+        };
+      })
+    }));
+  };
+
+  const addTemplateSection = () => {
+    const section = { id: createId(), name: 'New test group', tests: [] };
+    setTemplateDraft((prev) => ({
+      ...prev,
+      sections: [...(prev.sections || []), section]
+    }));
+  };
+
+  const addTemplateTest = (sectionId) => {
+    const newTest = {
+      id: createId(),
+      name: 'New parameter',
+      unit: '',
+      referenceRange: '',
+      options: [],
+      abnormalOptions: [],
+      criticalOptions: [],
+      criticalLow: '',
+      criticalHigh: '',
+      formula: ''
+    };
+    setTemplateDraft((prev) => ({
+      ...prev,
+      sections: prev.sections.map((sec) => {
+        if (sec.id !== sectionId) return sec;
+        return {
+          ...sec,
+          tests: [...(sec.tests || []), newTest]
+        };
+      })
+    }));
+  };
+
+  const removeTemplateTest = (sectionId, testId) => {
+    setTemplateDraft((prev) => ({
+      ...prev,
+      sections: prev.sections.map((sec) => {
+        if (sec.id !== sectionId) return sec;
+        return {
+          ...sec,
+          tests: sec.tests.filter((t) => t.id !== testId)
+        };
+      })
+    }));
+  };
+
+  const insertIntoTemplateFormula = (sectionId, testId, textToInsert) => {
+    setTemplateDraft((prev) => {
+      const section = prev.sections.find((s) => s.id === sectionId);
+      const currentTest = section?.tests.find((t) => t.id === testId);
+      const currentFormula = currentTest?.formula || '';
+      const separator = currentFormula && !/[+\-*/(\s]$/.test(currentFormula.trim()) ? ' ' : '';
+      const nextFormula = currentFormula ? `${currentFormula}${separator}${textToInsert}` : textToInsert;
+
+      return {
+        ...prev,
+        sections: prev.sections.map((sec) => {
+          if (sec.id !== sectionId) return sec;
+          return {
+            ...sec,
+            tests: sec.tests.map((t) => (t.id === testId ? { ...t, formula: nextFormula } : t))
+          };
+        })
+      };
+    });
+  };
+
+  const discardTemplateDraft = () => {
+    setTemplateDraft(JSON.parse(JSON.stringify(selectedTemplate)));
+    setTemplateEditing(false);
+  };
+
+  const startEditingTemplate = () => {
+    setTemplateEditing(true);
+  };
+
+  const startEditingTemplateDoctors = () => {
+    setTemplateDoctorEditing(true);
+  };
+
+  const saveTemplateDoctors = () => {
+    const next = { ...JSON.parse(JSON.stringify(selectedTemplate)), doctors: templateDoctorDraft.filter(Boolean) };
+    saveTemplate(next);
+    setTemplateDoctorEditing(false);
+  };
+
+  const discardTemplateDoctors = () => {
+    setTemplateDoctorDraft(JSON.parse(JSON.stringify(selectedTemplate?.doctors || [])));
+    setTemplateDoctorEditing(false);
+  };
+
+  const createDoctorTemplate = (doctorName) => {
+    const name = (doctorName || '').trim();
+    if (!name) return;
+    const next = {
+      ...JSON.parse(JSON.stringify(templateDraft || selectedTemplate)),
+      id: `doctor-${createId()}`,
+      name: `${name} Template`,
+      forDoctor: name,
+      doctors: [name]
+    };
+    saveTemplate(next);
+    setSelectedTemplateId(next.id);
   };
 
   return (
@@ -398,6 +566,31 @@ export function AppProvider({ children }) {
         activeSheetId,
         setActiveSheetId,
         activeTemplate,
+        selectedTemplateId,
+        setSelectedTemplateId,
+        selectTemplate,
+        selectedTemplate,
+        templateDraft,
+        setTemplateDraft,
+        templateEditing,
+        setTemplateEditing,
+        templateDoctorDraft,
+        setTemplateDoctorDraft,
+        templateDoctorEditing,
+        setTemplateDoctorEditing,
+        startEditingTemplate,
+        discardTemplateDraft,
+        updateTemplateDraft,
+        updateTemplateSection,
+        updateTemplateTest,
+        addTemplateSection,
+        addTemplateTest,
+        removeTemplateTest,
+        insertIntoTemplateFormula,
+        startEditingTemplateDoctors,
+        saveTemplateDoctors,
+        discardTemplateDoctors,
+        createDoctorTemplate,
         history,
         settings,
         setSettings,
