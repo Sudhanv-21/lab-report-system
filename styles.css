@@ -380,6 +380,7 @@ button { cursor: pointer; }
     gap: 0 !important;
   }
   .preview-page-wrapper {
+    page-break-before: auto !important;
     page-break-after: always !important;
     break-after: page !important;
     page-break-inside: avoid !important;
@@ -387,8 +388,10 @@ button { cursor: pointer; }
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
-    box-sizing: border-box !important;
+    height: auto !important;
+    max-height: none !important;
     display: block !important;
+    box-sizing: border-box !important;
   }
   .preview-page-wrapper:last-child {
     page-break-after: auto !important;
@@ -398,22 +401,20 @@ button { cursor: pointer; }
     position: relative !important;
     width: 100% !important;
     max-width: none !important;
-    min-height: 96vh !important;
+    min-height: 0 !important;
+    height: auto !important;
     margin: 0 !important;
-    padding: 10mm 12mm !important;
+    padding: 12mm 15mm !important;
     background: white !important;
     box-shadow: none !important;
     border-radius: 0 !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: space-between !important;
+    display: block !important;
     box-sizing: border-box !important;
   }
   .preview-page-sheet.sheet-a5 {
     padding: 8mm 10mm !important;
-    min-height: 94vh !important;
   }
   .no-print, .preview-header, .topbar, .tabbar-row, .preview-page-badge { display: none !important; }
 
