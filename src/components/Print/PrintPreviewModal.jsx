@@ -158,18 +158,27 @@ export function PrintPreviewModal() {
                       const critical = isCriticalResult(t, gender);
 
                       const style = t.style || {};
-                      const textStyle = {
+                      const baseStyle = {
                         fontSize: `${style.fontSize || 14}px`,
                         textAlign: style.alignment || 'left',
-                        fontWeight: style.bold ? '700' : abnormal || critical ? '700' : 'normal',
                         fontStyle: style.italic ? 'italic' : 'normal',
                         textDecoration: style.underline ? 'underline' : 'none'
                       };
 
+                      const nameStyle = {
+                        ...baseStyle,
+                        fontWeight: style.bold ? '700' : 'normal'
+                      };
+
+                      const valueStyle = {
+                        ...baseStyle,
+                        fontWeight: style.bold ? '700' : abnormal || critical ? '700' : 'normal'
+                      };
+
                       return (
                         <tr key={t.id}>
-                          <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle }}>{t.name}</td>
-                          <td style={{ padding: '6px', verticalAlign: 'top', ...textStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'}{!includeUnitsAsSeparateField && t.unit ? ` ${t.unit}` : ''} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
+                          <td style={{ padding: '6px', verticalAlign: 'top', ...nameStyle }}>{t.name}</td>
+                          <td style={{ padding: '6px', verticalAlign: 'top', ...valueStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'}{!includeUnitsAsSeparateField && t.unit ? ` ${t.unit}` : ''} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
                           {includeUnitsAsSeparateField && <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>}
                           <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{formatReferenceRange(t.referenceRange)}</td>
                         </tr>
