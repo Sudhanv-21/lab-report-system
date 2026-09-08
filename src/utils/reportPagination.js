@@ -8,18 +8,20 @@
 
 export function getPageCapacities(format = 'a4', letterheadSpacing = 0, footerSpacing = 0) {
   const base = {
-    a4: { intermediate: 17, last: 13 },
-    letter: { intermediate: 15, last: 11 },
-    legal: { intermediate: 23, last: 18 },
-    a5: { intermediate: 9, last: 6 }
-  }[format] || { intermediate: 17, last: 13 };
+    a4: { capacity: 13 },
+    letter: { capacity: 11 },
+    legal: { capacity: 18 },
+    a5: { capacity: 6 }
+  }[format] || { capacity: 13 };
 
   const extraLetterheadUnits = Math.max(0, Math.round((letterheadSpacing - 42) / 35));
   const extraFooterUnits = Math.max(0, Math.round(footerSpacing / 35));
 
+  const safeCapacity = Math.max(4, base.capacity - extraLetterheadUnits - extraFooterUnits);
+
   return {
-    intermediateCapacity: Math.max(6, base.intermediate - extraLetterheadUnits),
-    lastPageCapacity: Math.max(4, base.last - extraLetterheadUnits - extraFooterUnits)
+    intermediateCapacity: safeCapacity,
+    lastPageCapacity: safeCapacity
   };
 }
 
