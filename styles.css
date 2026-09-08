@@ -323,6 +323,15 @@ button { cursor: pointer; }
   font-size: 0.82rem !important;
 }
 
+.print-thead-header-cell,
+.print-thead-meta-cell {
+  padding: 0 !important;
+  border: none !important;
+  font-weight: normal !important;
+  text-align: left !important;
+  background: transparent !important;
+}
+
 .print-empty-header { border-bottom: 2px solid #163256; margin-bottom: 16px; }
 .print-patient-meta-grid > div { min-width: 0; overflow-wrap: anywhere; }
 .print-meta-right { text-align: left; }
@@ -347,6 +356,27 @@ button { cursor: pointer; }
     border-radius: 0 !important;
   }
   .no-print, .preview-header, .topbar, .tabbar-row { display: none !important; }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-main-heading-row,
+  .print-subheading-row {
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  .print-end-report,
+  .print-footer-container {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
 }
 
 @media (max-width: 960px) {

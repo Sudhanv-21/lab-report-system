@@ -110,109 +110,118 @@ export function PrintPreviewModal() {
 
         <div className="preview-body">
           <div className={`preview-page-sheet sheet-${pageFormat}`} id="printableReport">
-            {/* Keep an empty letterhead area separated from patient metadata. */}
-            <div
-              className="print-empty-header"
-              style={{ height: `${Math.max(settings.letterheadSpacing || 0, 42)}px` }}
-              aria-hidden="true"
-            />
+            {/* Main Report Table with repeated headers for multi-page printing */}
+            <div className="print-tests-container">
+              <table className="print-results-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '0.88rem' }}>
+                <thead>
+                  {/* Repeated Letterhead Spacing */}
+                  <tr>
+                    <th colSpan={includeUnitsAsSeparateField ? 4 : 3} className="print-thead-header-cell">
+                      <div
+                        className="print-empty-header"
+                        style={{ height: `${Math.max(settings.letterheadSpacing || 0, 42)}px` }}
+                        aria-hidden="true"
+                      />
+                    </th>
+                  </tr>
 
-          {/* Patient Metadata Grid */}
-          <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '16px', fontSize: '0.9rem' }}>
-            <div className="print-patient-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(220px, 0.75fr)', gap: '8px 24px', border: '1px solid #d7e3ee', padding: '12px', borderRadius: '6px' }}>
-              <div className="print-meta-left"><strong>Patient Name:</strong> {patient?.name || '—'}</div>
-              <div className="print-meta-right"><strong>Sample Date:</strong> {patient?.sampleCollectedAt ? patient.sampleCollectedAt.replace('T', ' ') : '—'}</div>
-              <div className="print-meta-left"><strong>Age / Gender:</strong> {patient?.age || '—'} / {gender === 'F' ? 'Female' : gender === 'O' ? 'Other' : 'Male'}</div>
-              <div className="print-meta-right"><strong>Report Date:</strong> {patient?.reportDate || (savedAt ? formatSavedAt(savedAt) : '—')}</div>
-              <div className="print-meta-left"><strong>Ref. By Doctor:</strong> {patient?.doctor || 'Self'}</div>
-              <div className="print-meta-right"><strong>Report ID:</strong> {previewReport.historyId || previewReport.id || 'LR-TEMP'}</div>
-            </div>
-          </div>
+                  {/* Repeated Patient Metadata Grid */}
+                  <tr>
+                    <th colSpan={includeUnitsAsSeparateField ? 4 : 3} className="print-thead-meta-cell">
+                      <div className={`print-patient-meta ${settings.metaBoxed ? 'boxed-meta' : ''}`} style={{ marginBottom: '16px', fontSize: '0.9rem' }}>
+                        <div className="print-patient-meta-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.25fr) minmax(220px, 0.75fr)', gap: '8px 24px', border: '1px solid #d7e3ee', padding: '12px', borderRadius: '6px' }}>
+                          <div className="print-meta-left"><strong>Patient Name:</strong> {patient?.name || '—'}</div>
+                          <div className="print-meta-right"><strong>Sample Date:</strong> {patient?.sampleCollectedAt ? patient.sampleCollectedAt.replace('T', ' ') : '—'}</div>
+                          <div className="print-meta-left"><strong>Age / Gender:</strong> {patient?.age || '—'} / {gender === 'F' ? 'Female' : gender === 'O' ? 'Other' : 'Male'}</div>
+                          <div className="print-meta-right"><strong>Report Date:</strong> {patient?.reportDate || (savedAt ? formatSavedAt(savedAt) : '—')}</div>
+                          <div className="print-meta-left"><strong>Ref. By Doctor:</strong> {patient?.doctor || 'Self'}</div>
+                          <div className="print-meta-right"><strong>Report ID:</strong> {previewReport.historyId || previewReport.id || 'LR-TEMP'}</div>
+                        </div>
+                      </div>
+                    </th>
+                  </tr>
 
-          {/* Tests Table */}
-          <div className="print-tests-container">
-            <table className="print-results-table" style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed', fontSize: '0.88rem' }}>
-              <thead>
-                <tr style={{ textAlign: 'left', color: '#5d7287' }}>
-                  <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '38%' : '42%' }}>Test / Parameter</th>
-                  <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '22%' : '28%' }}>Result Value</th>
-                  {includeUnitsAsSeparateField && <th style={{ padding: '6px', width: '15%' }}>Unit</th>}
-                  <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '25%' : '30%' }}>Biological Ref. Range</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tests?.map((group) => (
-                  <React.Fragment key={group.id}>
-                    <tr className="print-main-heading-row">
-                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '10px 6px 4px', fontFamily: group.headingStyle?.fontFamily || 'inherit', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
-                        {group.name}
-                      </td>
-                    </tr>
-                    {group.subheading && <tr className="print-subheading-row">
-                      <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '0 6px 7px', color: '#5d7287', fontFamily: group.subheadingStyle?.fontFamily || 'inherit', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
-                        {group.subheading}
-                      </td>
-                    </tr>}
-                    {group.tests?.map((t) => {
-                      const abnormal = isAbnormalResult(t, gender);
-                      const critical = isCriticalResult(t, gender);
+                  {/* Repeated Table Column Headers */}
+                  <tr className="print-table-header-row" style={{ textAlign: 'left', color: '#5d7287', borderBottom: '1px solid #d7e3ee' }}>
+                    <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '38%' : '42%', fontWeight: '700' }}>Test / Parameter</th>
+                    <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '22%' : '28%', fontWeight: '700' }}>Result Value</th>
+                    {includeUnitsAsSeparateField && <th style={{ padding: '6px', width: '15%', fontWeight: '700' }}>Unit</th>}
+                    <th style={{ padding: '6px', width: includeUnitsAsSeparateField ? '25%' : '30%', fontWeight: '700' }}>Biological Ref. Range</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tests?.map((group) => (
+                    <React.Fragment key={group.id}>
+                      <tr className="print-main-heading-row">
+                        <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '10px 6px 4px', fontFamily: group.headingStyle?.fontFamily || 'inherit', fontWeight: group.headingStyle?.bold ? '700' : '600', fontSize: `${group.headingStyle?.fontSize || 15}px`, textAlign: group.headingStyle?.alignment || 'left', fontStyle: group.headingStyle?.italic ? 'italic' : 'normal', textDecoration: group.headingStyle?.underline ? 'underline' : 'none' }}>
+                          {group.name}
+                        </td>
+                      </tr>
+                      {group.subheading && <tr className="print-subheading-row">
+                        <td colSpan={includeUnitsAsSeparateField ? 4 : 3} style={{ padding: '0 6px 7px', color: '#5d7287', fontFamily: group.subheadingStyle?.fontFamily || 'inherit', fontSize: `${group.subheadingStyle?.fontSize || 12}px`, textAlign: group.subheadingStyle?.alignment || 'left', fontWeight: group.subheadingStyle?.bold ? '700' : 'normal', fontStyle: group.subheadingStyle?.italic ? 'italic' : 'normal', textDecoration: group.subheadingStyle?.underline ? 'underline' : 'none' }}>
+                          {group.subheading}
+                        </td>
+                      </tr>}
+                      {group.tests?.map((t) => {
+                        const abnormal = isAbnormalResult(t, gender);
+                        const critical = isCriticalResult(t, gender);
 
-                      const style = t.style || {};
-                      const baseStyle = {
-                        fontSize: `${style.fontSize || 14}px`,
-                        textAlign: style.alignment || 'left',
-                        fontStyle: style.italic ? 'italic' : 'normal',
-                        textDecoration: style.underline ? 'underline' : 'none'
-                      };
+                        const style = t.style || {};
+                        const baseStyle = {
+                          fontSize: `${style.fontSize || 14}px`,
+                          textAlign: style.alignment || 'left',
+                          fontStyle: style.italic ? 'italic' : 'normal',
+                          textDecoration: style.underline ? 'underline' : 'none'
+                        };
 
-                      const nameStyle = {
-                        ...baseStyle,
-                        fontWeight: style.bold ? '700' : 'normal'
-                      };
+                        const nameStyle = {
+                          ...baseStyle,
+                          fontWeight: style.bold ? '700' : 'normal'
+                        };
 
-                      const valueStyle = {
-                        ...baseStyle,
-                        fontWeight: style.bold ? '700' : abnormal || critical ? '700' : 'normal'
-                      };
+                        const valueStyle = {
+                          ...baseStyle,
+                          fontWeight: style.bold ? '700' : abnormal || critical ? '700' : 'normal'
+                        };
 
-                      return (
-                        <tr key={t.id}>
-                          <td style={{ padding: '6px', verticalAlign: 'top', ...nameStyle }}>{t.name}</td>
-                          <td style={{ padding: '6px', verticalAlign: 'top', ...valueStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'}{!includeUnitsAsSeparateField && t.unit ? ` ${t.unit}` : ''} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
-                          {includeUnitsAsSeparateField && <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>}
-                          <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{formatReferenceRange(t.referenceRange)}</td>
-                        </tr>
-                      );
-                    })}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* End of Report & Signatures */}
-          <div style={{ textAlign: 'center', margin: '24px 0 12px', fontSize: '0.8rem', color: '#8c9ba5' }}>
-            *** END OF REPORT ***
-          </div>
-
-          <footer className="print-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', paddingTop: '10px' }}>
-            <div style={{ fontSize: '0.8rem', color: '#5d7287' }}>
-              <div>Printed: {new Date().toLocaleString()}</div>
-              <div>Report generated by Arun Clinical Lab</div>
+                        return (
+                          <tr key={t.id}>
+                            <td style={{ padding: '6px', verticalAlign: 'top', ...nameStyle }}>{t.name}</td>
+                            <td style={{ padding: '6px', verticalAlign: 'top', ...valueStyle, color: critical ? '#d74a4a' : abnormal ? '#163256' : 'inherit' }}>{t.value || '—'}{!includeUnitsAsSeparateField && t.unit ? ` ${t.unit}` : ''} {critical ? ' (Critical)' : abnormal ? ' *' : ''}</td>
+                            {includeUnitsAsSeparateField && <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287' }}>{t.unit || '—'}</td>}
+                            <td style={{ padding: '6px', verticalAlign: 'top', color: '#5d7287', whiteSpace: 'pre-line' }}>{formatReferenceRange(t.referenceRange)}</td>
+                          </tr>
+                        );
+                      })}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ borderTop: '1px solid #000', width: '180px', minHeight: '34px', paddingTop: '4px', fontWeight: '600', fontSize: '0.85rem' }}>
-                Signature
+            {/* End of Report & Signatures */}
+            <div className="print-end-report" style={{ textAlign: 'center', margin: '24px 0 12px', fontSize: '0.8rem', color: '#8c9ba5' }}>
+              *** END OF REPORT ***
+            </div>
+
+            <footer className="print-footer-container print-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '30px', paddingTop: '10px' }}>
+              <div style={{ fontSize: '0.8rem', color: '#5d7287' }}>
+                <div>Printed: {new Date().toLocaleString()}</div>
+                <div>Report generated by Arun Clinical Lab</div>
               </div>
-            </div>
-          </footer>
 
-          {settings.footerSpacing > 0 && (
-            <div style={{ height: `${settings.footerSpacing}px` }} />
-          )}
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ borderTop: '1px solid #000', width: '180px', minHeight: '34px', paddingTop: '4px', fontWeight: '600', fontSize: '0.85rem' }}>
+                  Signature
+                </div>
+              </div>
+            </footer>
+
+            {settings.footerSpacing > 0 && (
+              <div style={{ height: `${settings.footerSpacing}px` }} />
+            )}
+          </div>
         </div>
-      </div>
     </div>
   </div>
 );
