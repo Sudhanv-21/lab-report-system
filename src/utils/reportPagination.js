@@ -2,24 +2,24 @@
  * Medical Lab Report Pagination Utility
  *
  * Chunks test groups and individual tests into discrete physical pages (A4, Letter, Legal, A5)
- * so that each page cleanly contains letterhead spacing, patient metadata, table column headers,
- * and appropriate page footers with zero print corruption or table overlap.
+ * keeping entire test groups intact whenever possible. If a test group fits in the remaining space,
+ * it stays on the page; otherwise, the whole test group moves cleanly to the next page.
  */
 
 export function getPageCapacities(format = 'a4', letterheadSpacing = 0, footerSpacing = 0) {
   const base = {
-    a4: { intermediate: 14, last: 10 },
-    letter: { intermediate: 13, last: 9 },
-    legal: { intermediate: 19, last: 15 },
-    a5: { intermediate: 8, last: 5 }
-  }[format] || { intermediate: 14, last: 10 };
+    a4: { intermediate: 17, last: 13 },
+    letter: { intermediate: 15, last: 11 },
+    legal: { intermediate: 23, last: 18 },
+    a5: { intermediate: 9, last: 6 }
+  }[format] || { intermediate: 17, last: 13 };
 
   const extraLetterheadUnits = Math.max(0, Math.round((letterheadSpacing - 42) / 35));
   const extraFooterUnits = Math.max(0, Math.round(footerSpacing / 35));
 
   return {
-    intermediateCapacity: Math.max(5, base.intermediate - extraLetterheadUnits),
-    lastPageCapacity: Math.max(3, base.last - extraLetterheadUnits - extraFooterUnits)
+    intermediateCapacity: Math.max(6, base.intermediate - extraLetterheadUnits),
+    lastPageCapacity: Math.max(4, base.last - extraLetterheadUnits - extraFooterUnits)
   };
 }
 
@@ -49,30 +49,34 @@ export function paginateTestGroups(
     if (!test.referenceRange) return 1.0;
     const lines = String(test.referenceRange).split(/\r?\n|\|/).filter((s) => s.trim().length > 0).length;
     if (lines <= 1) return 1.0;
-    if (lines === 2) return 1.4;
-    if (lines === 3) return 1.8;
-    if (lines === 4) return 2.2;
-    return Math.min(3.2, 1.0 + (lines - 1) * 0.45);
+    if (lines === 2) return 1.35;
+    if (lines === 3) return 1.7;
+    if (lines === 4) return 2.0;
+    return Math.min(2.8, 1.0 + (lines - 1) * 0.4);
   };
 
   const HEADER_WEIGHT = 1.1;
   const SUBHEADER_WEIGHT = 0.75;
 
-  // Check if everything fits on a single page
+  const getGroupWeight = (group) => {
+    let w = HEADER_WEIGHT + (group.subheading ? SUBHEADER_WEIGHT : 0);
+    for (const t of group.tests || []) {
+      w += getItemWeight(t);
+    }
+    return w;
+  };
+
+  // Check if all test groups fit on a single page
   let totalSinglePageWeight = 0;
   for (const group of testGroups) {
-    totalSinglePageWeight += HEADER_WEIGHT;
-    if (group.subheading) totalSinglePageWeight += SUBHEADER_WEIGHT;
-    for (const t of group.tests || []) {
-      totalSinglePageWeight += getItemWeight(t);
-    }
+    totalSinglePageWeight += getGroupWeight(group);
   }
 
   if (totalSinglePageWeight <= lastPageCapacity) {
     return [{ pageNumber: 1, totalPages: 1, groups: testGroups }];
   }
 
-  // Multi-page chunking
+  // Multi-page distribution keeping groups intact
   const pages = [];
   let currentPageGroups = [];
   let currentPageWeight = 0;
@@ -90,66 +94,53 @@ export function paginateTestGroups(
 
   for (let gIndex = 0; gIndex < testGroups.length; gIndex++) {
     const group = testGroups[gIndex];
-    const groupTests = group.tests || [];
-    const groupHeaderWeight = HEADER_WEIGHT + (group.subheading ? SUBHEADER_WEIGHT : 0);
+    const groupWeight = getGroupWeight(group);
 
-    let entireGroupWeight = groupHeaderWeight;
-    for (const t of groupTests) {
-      entireGroupWeight += getItemWeight(t);
-    }
+    // If current page is empty
+    if (currentPageWeight === 0) {
+      // If group fits on fresh page as a whole
+      if (groupWeight <= intermediateCapacity) {
+        currentPageGroups.push(group);
+        currentPageWeight += groupWeight;
+      } else {
+        // Group itself is too big for a single page -> split its individual tests
+        let activeTests = [];
+        let curW = HEADER_WEIGHT + (group.subheading ? SUBHEADER_WEIGHT : 0);
+        let activeHeader = { ...group, isContinuation: false };
 
-    const availableOnCurrent = intermediateCapacity - currentPageWeight;
+        for (const t of group.tests || []) {
+          const tw = getItemWeight(t);
+          if (curW + tw > intermediateCapacity && activeTests.length > 0) {
+            currentPageGroups.push({ ...activeHeader, tests: activeTests });
+            currentPageWeight = curW;
+            pushCurrentPage();
 
-    // If entire group fits on current page:
-    if (currentPageWeight > 0 && entireGroupWeight <= availableOnCurrent) {
-      currentPageGroups.push(group);
-      currentPageWeight += entireGroupWeight;
-      continue;
-    }
+            activeTests = [];
+            activeHeader = { ...group, name: `${group.name} (Cont.)`, isContinuation: true };
+            curW = HEADER_WEIGHT + (group.subheading ? SUBHEADER_WEIGHT : 0);
+          }
+          activeTests.push(t);
+          curW += tw;
+        }
 
-    // If entire group fits on a fresh page:
-    if (currentPageWeight > 0 && entireGroupWeight <= intermediateCapacity) {
-      pushCurrentPage();
-      currentPageGroups.push(group);
-      currentPageWeight = entireGroupWeight;
-      continue;
-    }
-
-    // Otherwise split group across pages
-    const minGroupNeed = groupHeaderWeight + (groupTests.length > 0 ? getItemWeight(groupTests[0]) : 0);
-    if (currentPageWeight > 0 && (intermediateCapacity - currentPageWeight) < minGroupNeed) {
-      pushCurrentPage();
-    }
-
-    let activeGroupHeader = { ...group, isContinuation: false };
-    let activeTests = [];
-    currentPageWeight += groupHeaderWeight;
-
-    for (let tIndex = 0; tIndex < groupTests.length; tIndex++) {
-      const test = groupTests[tIndex];
-      const tWeight = getItemWeight(test);
-
-      if (currentPageWeight + tWeight > intermediateCapacity && activeTests.length > 0) {
-        currentPageGroups.push({
-          ...activeGroupHeader,
-          tests: activeTests
-        });
-        activeTests = [];
-        pushCurrentPage();
-
-        activeGroupHeader = { ...group, name: `${group.name} (Cont.)`, isContinuation: true };
-        currentPageWeight = groupHeaderWeight;
+        if (activeTests.length > 0) {
+          currentPageGroups.push({ ...activeHeader, tests: activeTests });
+          currentPageWeight = curW;
+        }
       }
-
-      activeTests.push(test);
-      currentPageWeight += tWeight;
+      continue;
     }
 
-    if (activeTests.length > 0) {
-      currentPageGroups.push({
-        ...activeGroupHeader,
-        tests: activeTests
-      });
+    // If current page is not empty:
+    // Check if the whole group fits in remaining space of current page
+    const available = intermediateCapacity - currentPageWeight;
+    if (groupWeight <= available) {
+      currentPageGroups.push(group);
+      currentPageWeight += groupWeight;
+    } else {
+      // Does not fit in remaining space -> Move the entire group to next page
+      pushCurrentPage();
+      gIndex--; // Re-process this group on the new fresh page
     }
   }
 
